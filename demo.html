@@ -1,0 +1,2854 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Engineer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        /* ── LIGHT THEME ── */
+        :root,
+        [data-theme="light"] {
+            --paper: #FBFBFA;
+            --paper2: #F4F3F0;
+            --paper3: #EEECEA;
+            --ink: #1A1A19;
+            --ink-soft: #555452;
+            --muted: #828079;
+            --hairline: #E5E3DE;
+            --hairline2: #EFEDE8;
+            --accent: #346538;
+            --accent-bg: #EDF3EC;
+            --accent-txt: #24492A;
+            --warn: #9F2F2D;
+            --warn-bg: #FDEBEC;
+            --warn-txt: #7A1E1C;
+            --amber-bg: #FFF8E7;
+            --amber-txt: #7A5700;
+            --shadow: 0 2px 14px rgba(0, 0, 0, .06);
+            --focus-ring: rgba(26, 26, 25, .08);
+            --nav-bg: rgba(251, 251, 250, .92);
+        }
+
+        [data-theme="dark"] {
+            --paper: #141412;
+            --paper2: #1C1C1A;
+            --paper3: #252522;
+            --ink: #F0EFEA;
+            --ink-soft: #A8A59E;
+            --muted: #6B6860;
+            --hairline: #2E2D2A;
+            --hairline2: #252522;
+            --accent: #5BAF60;
+            --accent-bg: #1A2E1B;
+            --accent-txt: #7DCE82;
+            --warn: #E06666;
+            --warn-bg: #2E1A1A;
+            --warn-txt: #F0A0A0;
+            --amber-bg: #2A2210;
+            --amber-txt: #D4A843;
+            --shadow: 0 2px 14px rgba(0, 0, 0, .3);
+            --focus-ring: rgba(240, 239, 234, .08);
+            --nav-bg: rgba(20, 20, 18, .92);
+        }
+
+        :root {
+            --serif: 'Instrument Serif', Georgia, serif;
+            --sans: 'Inter Tight', system-ui, sans-serif;
+            --mono: 'JetBrains Mono', ui-monospace, monospace;
+            --r: 4px;
+            --ease: cubic-bezier(.16, 1, .3, 1);
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--paper);
+            color: var(--ink);
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: 60px;
+        }
+
+        /* ── TRANSITIONS ── */
+        html,
+        body,
+        * {
+            transition: background-color .2s, border-color .2s, color .15s
+        }
+
+        .run-btn,
+        .chev,
+        .tog-th,
+        .prog-fill,
+        .sc-fill,
+        .gen-progress-fill {
+            transition: none !important
+        }
+
+        .run-btn {
+            transition: background .18s, border-color .18s, color .18s, transform .18s !important
+        }
+
+        .chev {
+            transition: transform .2s var(--ease) !important
+        }
+
+        .tog-th {
+            transition: transform .18s !important
+        }
+
+        .prog-fill,
+        .gen-progress-fill {
+            transition: width .35s var(--ease) !important
+        }
+
+        .sc-fill {
+            transition: width .8s var(--ease) !important
+        }
+
+        .jump-nav {
+            transition: opacity .3s, transform .3s !important
+        }
+
+        .sec-body {
+            transition: max-height .28s var(--ease), opacity .2s !important
+        }
+
+        /* ── TOP PROGRESS BAR ── */
+        .top-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            z-index: 999;
+            pointer-events: none
+        }
+
+        .prog-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: var(--ink)
+        }
+
+        .prog-fill.live {
+            background: linear-gradient(90deg, var(--ink) 0%, var(--accent) 50%, var(--ink) 100%);
+            background-size: 200% 100%;
+            animation: sweep 1.4s linear infinite
+        }
+
+        @keyframes sweep {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        /* ── STICKY NAV ── */
+        .site-nav {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            height: 54px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .brand {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .brand-name {
+            font-family: var(--serif);
+            font-size: 18px;
+            letter-spacing: -.02em;
+            color: var(--ink)
+        }
+
+        .brand-name em {
+            font-style: italic;
+            color: var(--ink-soft)
+        }
+
+        .brand-sep {
+            width: 1px;
+            height: 11px;
+            background: var(--hairline);
+            align-self: center
+        }
+
+        .brand-tag {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--muted)
+        }
+
+        .nav-mid {
+            display: flex;
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            overflow: hidden
+        }
+
+        .ntab {
+            padding: 5px 13px;
+            font-size: 11px;
+            font-weight: 500;
+            font-family: var(--sans);
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            border-right: 1px solid var(--hairline);
+            letter-spacing: .01em;
+            transition: background .12s, color .12s;
+            white-space: nowrap
+        }
+
+        .ntab:last-child {
+            border-right: none
+        }
+
+        .ntab.on {
+            background: var(--ink);
+            color: var(--paper)
+        }
+
+        .ntab:hover:not(.on) {
+            background: var(--paper2);
+            color: var(--ink)
+        }
+
+        .nav-r {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .provider-badge {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: var(--accent-bg);
+            color: var(--accent-txt);
+            border: 1px solid var(--accent);
+            white-space: nowrap;
+        }
+
+        .theme-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border: 1px solid var(--hairline);
+            border-radius: 999px;
+            background: var(--paper2);
+            color: var(--ink-soft);
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            transition: border-color .15s, color .15s !important;
+        }
+
+        .theme-btn:hover {
+            border-color: var(--ink-soft);
+            color: var(--ink)
+        }
+
+        .theme-ico {
+            font-size: 11px;
+            line-height: 1
+        }
+
+        /* ── HERO ── */
+        .hero {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 40px 60px;
+            border-bottom: 1px solid var(--hairline);
+        }
+
+        .hero-eyebrow {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .26em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hero-eyebrow::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--hairline);
+            max-width: 60px
+        }
+
+        .hero-h1 {
+            font-family: var(--serif);
+            font-size: clamp(38px, 5vw, 62px);
+            font-weight: 400;
+            line-height: 1.03;
+            letter-spacing: -.03em;
+            color: var(--ink);
+            margin-bottom: 24px;
+        }
+
+        .hero-h1 em {
+            font-style: italic;
+            color: var(--ink-soft)
+        }
+
+        .hero-sub {
+            font-size: 14px;
+            color: var(--ink-soft);
+            line-height: 1.75;
+            max-width: 52ch;
+            border-top: 1px solid var(--hairline);
+            padding-top: 18px;
+        }
+
+        /* ── SITE WRAP ── */
+        .site-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 40px
+        }
+
+        /* ── INPUT ZONE ── */
+        .input-zone {
+            padding: 48px 0 32px
+        }
+
+        .iz-head {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .iz-head::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--hairline)
+        }
+
+        /* ── FORM ELEMENTS ── */
+        textarea,
+        input[type=text],
+        input[type=password],
+        select {
+            width: 100%;
+            background: var(--paper2);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            color: var(--ink);
+            font-family: var(--sans);
+            font-size: 13px;
+            padding: 8px 11px;
+            outline: none;
+            line-height: 1.5;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        textarea {
+            resize: vertical
+        }
+
+        textarea:focus,
+        input:focus,
+        select:focus {
+            border-color: var(--ink-soft);
+            box-shadow: 0 0 0 3px var(--focus-ring)
+        }
+
+        textarea::placeholder,
+        input::placeholder {
+            color: var(--muted)
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23828079'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 28px;
+            cursor: pointer
+        }
+
+        .fgroup {
+            margin-bottom: 20px
+        }
+
+        .flbl {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
+            display: block
+        }
+
+        .hint-txt {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        /* ── TEMPLATE PICKER ── */
+        .tpl-list {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            overflow: hidden
+        }
+
+        .tpl-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            cursor: pointer;
+            background: var(--paper2);
+            border-bottom: 1px solid var(--hairline);
+            transition: background .12s
+        }
+
+        .tpl-item:last-child {
+            border-bottom: none
+        }
+
+        .tpl-item:hover {
+            background: var(--paper3)
+        }
+
+        .tpl-item.sel {
+            background: var(--accent-bg)
+        }
+
+        .tpl-radio {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            border: 1.5px solid var(--hairline);
+            flex-shrink: 0;
+            transition: background .15s, border-color .15s
+        }
+
+        .tpl-item.sel .tpl-radio {
+            background: var(--accent);
+            border-color: var(--accent)
+        }
+
+        .tpl-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .tpl-name {
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--ink)
+        }
+
+        .tpl-item.sel .tpl-name {
+            color: var(--accent-txt)
+        }
+
+        .tpl-desc {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 1px
+        }
+
+        .ats-badge {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .04em;
+            padding: 2px 7px;
+            border-radius: 999px;
+            flex-shrink: 0
+        }
+
+        .ab5 {
+            background: var(--accent-bg);
+            color: var(--accent-txt);
+            border: 1px solid var(--accent)
+        }
+
+        .ab4 {
+            background: var(--amber-bg);
+            color: var(--amber-txt);
+            border: 1px solid #c8a000
+        }
+
+        .ab3 {
+            background: var(--warn-bg);
+            color: var(--warn-txt);
+            border: 1px solid var(--warn)
+        }
+
+        /* ── TOGGLES ── */
+        .togs {
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            overflow: hidden
+        }
+
+        .tog-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 13px;
+            background: var(--paper2);
+            border-bottom: 1px solid var(--hairline)
+        }
+
+        .tog-row:last-child {
+            border-bottom: none
+        }
+
+        .tog-lbl {
+            font-size: 12.5px;
+            color: var(--ink-soft)
+        }
+
+        .tog {
+            position: relative;
+            width: 32px;
+            height: 17px;
+            flex-shrink: 0
+        }
+
+        .tog input {
+            opacity: 0;
+            width: 0;
+            height: 0
+        }
+
+        .tog-tr {
+            position: absolute;
+            inset: 0;
+            border-radius: 9px;
+            background: var(--hairline2);
+            cursor: pointer;
+            border: 1px solid var(--hairline)
+        }
+
+        .tog input:checked+.tog-tr {
+            background: var(--ink);
+            border-color: var(--ink)
+        }
+
+        .tog-th {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--paper);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .14);
+            pointer-events: none
+        }
+
+        .tog input:checked~.tog-th {
+            transform: translateX(15px)
+        }
+
+        /* ── ACCORDION SECTIONS ── */
+        .sec {
+            border-top: 1px solid var(--hairline)
+        }
+
+        .sec:first-child {
+            border-top: none
+        }
+
+        .sec-hd {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .sec-hd:hover .sec-title {
+            color: var(--ink)
+        }
+
+        .sec-hd-l {
+            display: flex;
+            align-items: center;
+            gap: 9px
+        }
+
+        .sec-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0
+        }
+
+        .sec-title {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--ink-soft)
+        }
+
+        .sec-hd-r {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .sec-add {
+            font-family: var(--sans);
+            font-size: 10.5px;
+            padding: 2px 9px;
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: border-color .12s, color .12s
+        }
+
+        .sec-add:hover {
+            border-color: var(--ink-soft);
+            color: var(--ink)
+        }
+
+        .chev {
+            font-size: 9px;
+            color: var(--muted)
+        }
+
+        .chev.open {
+            transform: rotate(180deg)
+        }
+
+        .sec-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+            max-height: 2000px;
+            padding-bottom: 14px
+        }
+
+        .sec-body.closed {
+            max-height: 0;
+            padding-bottom: 0;
+            opacity: 0
+        }
+
+        /* ── ENTRY CARDS ── */
+        .entry {
+            background: var(--paper2);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            padding: 12px
+        }
+
+        .entry-hd {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px
+        }
+
+        .entry-n {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--muted)
+        }
+
+        .rm {
+            width: 20px;
+            height: 20px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .12s, color .12s
+        }
+
+        .rm:hover {
+            background: var(--warn-bg);
+            color: var(--warn)
+        }
+
+        .fg {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px
+        }
+
+        .full {
+            grid-column: 1/-1
+        }
+
+        .ff {
+            display: flex;
+            flex-direction: column;
+            gap: 3px
+        }
+
+        .ff label {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        /* ── STICKY GENERATE BAR ── */
+        .gen-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 300;
+            background: var(--paper);
+            border-top: 1px solid var(--hairline);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, .06);
+        }
+
+        [data-theme="dark"] .gen-bar {
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, .2)
+        }
+
+        .gen-progress {
+            height: 2px;
+            background: transparent;
+            overflow: hidden
+        }
+
+        .gen-progress-fill {
+            height: 100%;
+            width: 0;
+            background: var(--ink)
+        }
+
+        .gen-progress-fill.live {
+            background: linear-gradient(90deg, var(--ink) 0%, var(--accent) 50%, var(--ink) 100%);
+            background-size: 200% 100%;
+            animation: sweep 1.4s linear infinite
+        }
+
+        .gen-controls {
+            padding: 10px 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .gen-provider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+            flex-wrap: wrap
+        }
+
+        .gen-sel {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .08em;
+            padding: 5px 28px 5px 10px;
+            border-radius: var(--r);
+            height: 32px;
+            background: var(--paper2);
+            border: 1px solid var(--hairline);
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .gen-sel:focus {
+            border-color: var(--ink-soft)
+        }
+
+        .gen-key-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            min-width: 160px;
+            max-width: 280px
+        }
+
+        .gen-key-lbl {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--muted);
+            white-space: nowrap;
+            flex-shrink: 0
+        }
+
+        .gen-key {
+            font-family: var(--mono);
+            font-size: 11px;
+            height: 32px;
+            padding: 5px 10px;
+            flex: 1;
+            letter-spacing: .04em;
+        }
+
+        .gen-key::placeholder {
+            letter-spacing: .02em;
+            font-size: 10px
+        }
+
+        .run-btn {
+            height: 38px;
+            padding: 0 24px;
+            border: 1px solid var(--ink);
+            border-radius: var(--r);
+            font-family: var(--sans);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            background: var(--ink);
+            color: var(--paper);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .run-btn:hover:not(:disabled) {
+            background: #2A2A28;
+            border-color: #2A2A28;
+            transform: translateY(-1px)
+        }
+
+        [data-theme="dark"] .run-btn:hover:not(:disabled) {
+            background: #D8D7D2;
+            border-color: #D8D7D2;
+            color: var(--ink)
+        }
+
+        .run-btn:active:not(:disabled) {
+            transform: none
+        }
+
+        .run-btn:disabled {
+            background: var(--paper3);
+            border-color: var(--hairline);
+            color: var(--muted);
+            cursor: not-allowed;
+            transform: none
+        }
+
+        .spin {
+            width: 12px;
+            height: 12px;
+            border: 1.5px solid rgba(255, 255, 255, .3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+            flex-shrink: 0
+        }
+
+        [data-theme="dark"] .spin {
+            border-color: rgba(26, 26, 25, .3);
+            border-top-color: var(--ink)
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* ── MOBILE COLLAPSE ── */
+        .gen-mobile-toggle {
+            display: none;
+            width: 100%;
+            padding: 7px 40px;
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--muted);
+            background: var(--paper2);
+            border: none;
+            border-bottom: 1px solid var(--hairline);
+            cursor: pointer;
+            text-align: left
+        }
+
+        .gen-collapsible {
+            display: flex;
+            flex-direction: column
+        }
+
+        /* ── OUTPUT ZONE ── */
+        .output-zone {
+            padding: 0 0 60px
+        }
+
+        .output-zone.hidden {
+            display: none
+        }
+
+        /* ── OUTPUT CARD ── */
+        .ocard {
+            border-top: 1px solid var(--hairline);
+            padding: 40px 0;
+            animation: fadeup .22s ease both;
+        }
+
+        @keyframes fadeup {
+            from {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .ocard-lbl {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ocard-lbl::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--hairline)
+        }
+
+        .ocard-lbl .lbl-num {
+            font-family: var(--mono);
+            font-size: 9px;
+            color: var(--accent-txt);
+            background: var(--accent-bg);
+            border: 1px solid var(--accent);
+            padding: 1px 7px;
+            border-radius: 999px;
+            letter-spacing: .08em;
+        }
+
+        /* ── SCORES ── */
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            border: 1px solid var(--hairline);
+            border-radius: 5px;
+            overflow: hidden;
+            background: var(--hairline);
+            margin-bottom: 24px
+        }
+
+        .sc {
+            background: var(--paper);
+            padding: 20px 24px
+        }
+
+        .sc-n {
+            font-family: var(--serif);
+            font-size: 52px;
+            line-height: 1;
+            letter-spacing: -.03em;
+            font-weight: 400
+        }
+
+        .sc-l {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: 8px
+        }
+
+        .sc-bar {
+            height: 2px;
+            background: var(--hairline);
+            margin-top: 14px;
+            border-radius: 1px;
+            overflow: hidden
+        }
+
+        .sc-fill {
+            height: 100%;
+            border-radius: 1px
+        }
+
+        .sc.hi .sc-n {
+            color: var(--accent-txt)
+        }
+
+        .sc.hi .sc-fill {
+            background: var(--accent)
+        }
+
+        .sc.mid .sc-n {
+            color: var(--amber-txt)
+        }
+
+        .sc.mid .sc-fill {
+            background: #c8a000
+        }
+
+        .sc.lo .sc-n {
+            color: var(--warn)
+        }
+
+        .sc.lo .sc-fill {
+            background: var(--warn)
+        }
+
+        /* ── CHIPS ── */
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px
+        }
+
+        .chip {
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .04em
+        }
+
+        .chip-miss {
+            background: var(--warn-bg);
+            border: 1px solid var(--warn);
+            color: var(--warn-txt)
+        }
+
+        .chip-hit {
+            background: var(--accent-bg);
+            border: 1px solid var(--accent);
+            color: var(--accent-txt)
+        }
+
+        .chip-neu {
+            background: var(--paper2);
+            border: 1px solid var(--hairline);
+            color: var(--muted)
+        }
+
+        /* ── ANALYSIS TEXT ── */
+        .atext {
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--ink-soft)
+        }
+
+        .atext ul {
+            padding-left: 18px;
+            margin-top: 6px
+        }
+
+        .atext li {
+            margin-bottom: 5px
+        }
+
+        .atext strong {
+            color: var(--ink)
+        }
+
+        .subsec-lbl {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 20px 0 8px;
+            display: block
+        }
+
+        /* ── CODE ── */
+        .code-meta {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .08em;
+            color: var(--muted);
+            margin-bottom: 10px
+        }
+
+        .code-meta span {
+            color: var(--ink)
+        }
+
+        .code-box {
+            background: var(--paper2);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            padding: 16px;
+            font-family: var(--mono);
+            font-size: 10px;
+            line-height: 1.7;
+            color: var(--ink-soft);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 500px;
+            overflow-y: auto
+        }
+
+        .code-box::-webkit-scrollbar {
+            width: 3px;
+            height: 3px
+        }
+
+        .code-box::-webkit-scrollbar-thumb {
+            background: var(--hairline2)
+        }
+
+        .cpbtn {
+            margin-top: 10px;
+            width: 100%;
+            padding: 9px;
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            background: var(--paper2);
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: border-color .12s, color .12s, background .12s
+        }
+
+        .cpbtn:hover {
+            border-color: var(--ink-soft);
+            color: var(--ink)
+        }
+
+        .cpbtn.ok {
+            background: var(--accent-bg);
+            border-color: var(--accent);
+            color: var(--accent-txt)
+        }
+
+        /* ── DIFF ── */
+        .diff-box {
+            background: var(--paper2);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            padding: 10px;
+            max-height: 500px;
+            overflow-y: auto
+        }
+
+        .diff-box::-webkit-scrollbar {
+            width: 3px
+        }
+
+        .diff-box::-webkit-scrollbar-thumb {
+            background: var(--hairline2)
+        }
+
+        .dl {
+            font-family: var(--mono);
+            font-size: 10px;
+            padding: 1px 6px;
+            border-radius: 2px;
+            line-height: 1.7
+        }
+
+        .dl.dla {
+            background: var(--accent-bg);
+            color: var(--accent-txt)
+        }
+
+        .dl.dlr {
+            background: var(--warn-bg);
+            color: var(--warn-txt)
+        }
+
+        .dl.dlc {
+            color: var(--muted)
+        }
+
+        /* ── COVER ── */
+        .cover-box {
+            font-size: 14.5px;
+            line-height: 1.85;
+            color: var(--ink);
+            background: var(--paper);
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            padding: 22px 26px;
+            white-space: pre-wrap;
+            font-family: var(--serif);
+            font-style: italic
+        }
+
+        /* ── PDF ── */
+        .pdf-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px
+        }
+
+        .pdf-meta {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--muted)
+        }
+
+        .pdf-actions {
+            display: flex;
+            gap: 7px
+        }
+
+        .pdf-action {
+            padding: 5px 12px;
+            font-size: 11.5px;
+            font-weight: 500;
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            background: var(--paper2);
+            color: var(--muted);
+            cursor: pointer;
+            font-family: var(--sans);
+            transition: border-color .12s, color .12s
+        }
+
+        .pdf-action:hover {
+            border-color: var(--ink-soft);
+            color: var(--ink)
+        }
+
+        .pdf-page {
+            background: #fff;
+            border: 1px solid #E5E3DE;
+            border-radius: 2px;
+            padding: 34px 40px;
+            font-family: 'Georgia', serif;
+            font-size: 9.5px;
+            color: #1A1A19;
+            line-height: 1.45;
+            max-width: 560px;
+            box-shadow: 0 2px 14px rgba(0, 0, 0, .1)
+        }
+
+        .pdf-name {
+            font-size: 17px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -.3px;
+            margin-bottom: 3px;
+            color: #1A1A19
+        }
+
+        .pdf-contact {
+            font-size: 8px;
+            text-align: center;
+            color: #555;
+            font-family: 'Arial', sans-serif;
+            margin-bottom: 13px;
+            letter-spacing: .02em
+        }
+
+        .pdf-sec {
+            font-size: 8.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            border-bottom: 1px solid #1A1A19;
+            padding-bottom: 2px;
+            margin: 11px 0 6px;
+            font-family: 'Arial', sans-serif;
+            color: #1A1A19
+        }
+
+        .pdf-entry {
+            margin-bottom: 7px
+        }
+
+        .pdf-hd {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 9px;
+            color: #1A1A19
+        }
+
+        .pdf-sub {
+            display: flex;
+            justify-content: space-between;
+            font-style: italic;
+            font-size: 8.5px;
+            color: #444;
+            margin-bottom: 3px
+        }
+
+        .pdf-ul {
+            padding-left: 12px;
+            margin: 0
+        }
+
+        .pdf-ul li {
+            margin-bottom: 1.5px;
+            font-size: 8.5px;
+            color: #1A1A19
+        }
+
+        .pdf-hint {
+            margin-top: 12px;
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center
+        }
+
+        .pdf-hint a {
+            color: var(--accent-txt)
+        }
+
+        .pdf-empty {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-align: center;
+            padding: 40px;
+            border: 1px dashed var(--hairline);
+            border-radius: var(--r)
+        }
+
+        /* ── CHECKLIST ── */
+        .chk-list {
+            border: 1px solid var(--hairline);
+            border-radius: var(--r);
+            overflow: hidden;
+            margin-bottom: 12px
+        }
+
+        .ci {
+            display: grid;
+            grid-template-columns: 4.5ch 1fr;
+            gap: 10px;
+            align-items: baseline;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--hairline);
+            font-size: 13px
+        }
+
+        .ci:last-child {
+            border-bottom: none
+        }
+
+        .ci.pass {
+            background: var(--accent-bg)
+        }
+
+        .ci.fail {
+            background: var(--warn-bg)
+        }
+
+        .ci-ico {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .1em;
+            text-transform: uppercase
+        }
+
+        .ci.pass .ci-ico {
+            color: var(--accent-txt)
+        }
+
+        .ci.fail .ci-ico {
+            color: var(--warn-txt)
+        }
+
+        .ci.pass .ci-txt {
+            color: var(--accent-txt)
+        }
+
+        .ci.fail .ci-txt {
+            color: var(--warn-txt)
+        }
+
+        .verdict {
+            padding: 16px 20px;
+            border-radius: var(--r);
+            font-family: var(--serif);
+            font-size: 16.5px;
+            line-height: 1.6;
+            font-style: italic
+        }
+
+        .verdict.ok {
+            background: var(--accent-bg);
+            border: 1px solid var(--accent);
+            color: var(--accent-txt)
+        }
+
+        .verdict.wait {
+            background: var(--amber-bg);
+            border: 1px solid #c8a000;
+            color: var(--amber-txt)
+        }
+
+        /* ── LOADING STATE ── */
+        .loading-zone {
+            padding: 40px 0
+        }
+
+        .ls-eyebrow {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 20px
+        }
+
+        .ls-steps {
+            list-style: none;
+            border-top: 1px solid var(--hairline)
+        }
+
+        .ls-step {
+            display: grid;
+            grid-template-columns: 4ch 1fr;
+            gap: 14px;
+            align-items: baseline;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--hairline);
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted)
+        }
+
+        .ls-step-n {
+            color: var(--hairline)
+        }
+
+        .ls-step.on {
+            color: var(--ink)
+        }
+
+        .ls-step.on .ls-step-n {
+            color: var(--accent)
+        }
+
+        .ls-step.done {
+            color: var(--accent-txt)
+        }
+
+        .ls-step.done .ls-step-n {
+            color: var(--accent)
+        }
+
+        /* ── JUMP NAV ── */
+        .jump-nav {
+            position: fixed;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border: 1px solid var(--hairline);
+            border-radius: 6px;
+            background: var(--paper2);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 150;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .jump-nav.visible {
+            opacity: 1;
+            pointer-events: auto
+        }
+
+        .jlink {
+            display: block;
+            padding: 7px 13px;
+            font-family: var(--mono);
+            font-size: 8.5px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            border-bottom: 1px solid var(--hairline);
+            transition: background .1s, color .1s !important;
+            white-space: nowrap;
+        }
+
+        .jlink:last-child {
+            border-bottom: none
+        }
+
+        .jlink:hover {
+            background: var(--paper3);
+            color: var(--ink)
+        }
+
+        /* ── FOOTER ── */
+        .site-footer {
+            border-top: 1px solid var(--hairline);
+            padding: 24px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer-l {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--muted)
+        }
+
+        .footer-r {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .footer-r:hover {
+            color: var(--ink)
+        }
+
+        .footer-r-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        .footer-sub-link {
+            font-family: var(--mono);
+            font-size: 8.5px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color .12s;
+        }
+        .footer-sub-link:hover {
+            color: var(--ink);
+        }
+
+        /* ── DIVIDER ── */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--hairline);
+            margin: 0
+        }
+
+        /* ── SCROLLBARS ── */
+        ::-webkit-scrollbar {
+            width: 3px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--hairline2)
+        }
+
+        /* ── MOBILE ── */
+        @media(max-width:768px) {
+            .site-nav {
+                padding: 0 16px
+            }
+
+            .brand-tag,
+            .brand-sep {
+                display: none
+            }
+
+            .nav-mid .ntab {
+                padding: 5px 10px;
+                font-size: 10.5px
+            }
+
+            .hero {
+                padding: 48px 16px 40px
+            }
+
+            .site-wrap {
+                padding: 0 16px
+            }
+
+            .gen-controls {
+                padding: 8px 16px;
+                gap: 8px
+            }
+
+            .gen-mobile-toggle {
+                display: block
+            }
+
+            .gen-collapsible {
+                display: none
+            }
+
+            .gen-collapsible.open {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                padding: 8px 16px
+            }
+
+            .gen-provider-wrap {
+                flex-direction: column;
+                align-items: stretch
+            }
+
+            .gen-key-wrap {
+                max-width: 100%
+            }
+
+            .jump-nav {
+                position: fixed;
+                bottom: 100px;
+                top: auto;
+                right: 0;
+                left: 0;
+                transform: none;
+                flex-direction: row;
+                border-radius: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                white-space: nowrap;
+                flex-wrap: nowrap;
+                border-left: none;
+                border-right: none;
+                border-radius: 0;
+            }
+
+            .jlink {
+                border-bottom: none;
+                border-right: 1px solid var(--hairline);
+                padding: 10px 14px
+            }
+
+            .jlink:last-child {
+                border-right: none
+            }
+
+            .score-grid {
+                grid-template-columns: 1fr
+            }
+
+            .fg {
+                grid-template-columns: 1fr
+            }
+
+            .full {
+                grid-column: 1
+            }
+
+            .site-footer {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+                padding: 20px 16px
+            }
+
+            .footer-r-group {
+                align-items: center;
+            }
+
+            .run-btn {
+                width: 100%
+            }
+
+            .gen-controls {
+                flex-direction: column;
+                align-items: stretch
+            }
+
+            .run-btn {
+                height: 44px;
+                font-size: 14px;
+                justify-content: center
+            }
+        }
+
+        /* ── KEYS DROPDOWN ── */
+        .keys-btn-wrap { position: relative; }
+        .keys-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 4px 13px; border-radius: 999px;
+            border: 1px solid var(--accent);
+            background: var(--accent-bg); color: var(--accent-txt);
+            font-family: var(--mono); font-size: 9px;
+            letter-spacing: .14em; text-transform: uppercase;
+            cursor: pointer; user-select: none; white-space: nowrap;
+            transition: background .18s, color .18s, border-color .18s !important;
+        }
+        .keys-btn:hover, .keys-btn-wrap:focus-within .keys-btn {
+            background: var(--accent); color: var(--paper); border-color: var(--accent);
+        }
+        .keys-dropdown {
+            position: absolute; top: calc(100% + 10px); right: 0;
+            min-width: 260px;
+            background: var(--paper); border: 1px solid var(--hairline);
+            border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.12);
+            padding: 12px; z-index: 500;
+            opacity: 0; pointer-events: none;
+            transform: translateY(-6px);
+            transition: opacity .18s var(--ease), transform .18s var(--ease) !important;
+        }
+        .keys-btn-wrap.open .keys-dropdown {
+            opacity: 1; pointer-events: auto; transform: translateY(0);
+        }
+        .keys-btn-wrap.open .keys-btn {
+            background: var(--accent); color: var(--paper); border-color: var(--accent);
+        }
+        .kdrop-lbl {
+            font-family: var(--mono); font-size: 8px;
+            letter-spacing: .22em; text-transform: uppercase;
+            color: var(--muted); margin-bottom: 7px; display: block;
+        }
+        .kdrop-options { display: flex; gap: 5px; margin-bottom: 12px; }
+        .kdrop-opt {
+            flex: 1; padding: 6px 8px; text-align: center;
+            border: 1px solid var(--hairline); border-radius: var(--r);
+            background: var(--paper2); color: var(--ink-soft);
+            font-family: var(--mono); font-size: 9px;
+            letter-spacing: .1em; text-transform: uppercase;
+            cursor: pointer;
+            transition: border-color .12s, background .12s, color .12s;
+        }
+        .kdrop-opt:hover { border-color: var(--ink-soft); color: var(--ink); }
+        .kdrop-opt.active {
+            background: var(--accent-bg); border-color: var(--accent);
+            color: var(--accent-txt);
+        }
+        .kdrop-key-lbl {
+            font-family: var(--mono); font-size: 8px;
+            letter-spacing: .2em; text-transform: uppercase;
+            color: var(--muted); margin-bottom: 5px; display: block;
+        }
+
+        /* ── API KEY & PDF UPLOAD ACTIONS ── */
+        .kdrop-key-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .kdrop-key-row input {
+            flex: 1;
+        }
+        .kdrop-key-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--accent);
+            border-radius: var(--r);
+            background: var(--accent-bg);
+            color: var(--accent-txt);
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background .12s, color .12s, border-color .12s;
+        }
+        .kdrop-key-btn:hover {
+            background: var(--accent);
+            color: var(--paper);
+        }
+        .flbl-action:hover {
+            color: var(--accent) !important;
+        }
+
+        /* ── GENERATE BUTTON IN OPTIONS ── */
+        .gen-in-options { padding: 24px 0 0; }
+        .gen-in-options .run-btn {
+            width: 100%; height: 44px;
+            font-size: 14px; justify-content: center;
+        }
+
+        /* ── SCROLL HIGHLIGHT ── */
+        @keyframes sectionSlideUp {
+            from { opacity: .55; transform: translateY(10px); }
+            to   { opacity: 1;   transform: translateY(0); }
+        }
+        .scroll-highlight { animation: sectionSlideUp .45s var(--ease) both; }
+    </style>
+    <!-- PDF.js for parsing PDF uploads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+</head>
+
+<body>
+
+    <!-- ── TOP PROGRESS ── -->
+    <div class="top-progress">
+        <div class="prog-fill" id="top-prog"></div>
+    </div>
+
+    <!-- ── NAV ── -->
+    <nav class="site-nav">
+        <div class="brand" onclick="scrollToHero()">
+            <span class="brand-name">Resume <em>Engineer</em></span>
+            <span class="brand-sep"></span>
+            <span class="brand-tag">ATS-Optimised</span>
+        </div>
+        <div class="nav-mid">
+            <button class="ntab on" id="mbL" onclick="setMode('latex')">LaTeX mode</button>
+            <button class="ntab" id="mbF" onclick="setMode('form')">Build from scratch</button>
+        </div>
+        <div class="nav-r">
+            <!-- ── KEYS DROPDOWN BUTTON ── -->
+            <div class="keys-btn-wrap">
+                <button class="keys-btn" id="keys-btn">⚿ Keys</button>
+                <div class="keys-dropdown">
+                    <span class="kdrop-lbl">Provider</span>
+                    <div class="kdrop-options">
+                        <div class="kdrop-opt" id="kopt-openrouter" data-provider="openrouter" onclick="selectKeyProvider('openrouter')">OpenRouter</div>
+                        <div class="kdrop-opt active" id="kopt-gemini" data-provider="gemini" onclick="selectKeyProvider('gemini')">Gemini</div>
+                    </div>
+                    <span class="kdrop-key-lbl">API Key</span>
+                    <div class="kdrop-key-row">
+                        <input type="password" class="gen-key" id="api-key-input"
+                            placeholder="Paste your key here…">
+                        <button class="kdrop-key-btn" onclick="saveKey()">Save</button>
+                    </div>
+                </div>
+            </div>
+            <button class="theme-btn" onclick="toggleTheme()">
+                <span class="theme-ico" id="theme-ico">☀</span>
+                <span id="theme-lbl">Light</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <section class="hero">
+        <div class="hero-eyebrow">— Resume Engineer · ATS-Optimised</div>
+        <h1 class="hero-h1">Your tailored resume,<br><em>built to clear the machine.</em></h1>
+        <p class="hero-sub">Paste your LaTeX or fill out the form, add a job description, pick a template — and get a
+            fully tailored resume with ATS keyword analysis, a diff against your base, a cover letter, and a live PDF
+            preview. All in one shot.</p>
+    </section>
+
+    <!-- ── MAIN CONTENT ── -->
+    <div class="site-wrap">
+
+        <!-- ── INPUT ZONE ── -->
+        <div class="input-zone">
+            <div class="iz-head">Input</div>
+
+            <!-- LATEX MODE -->
+            <div id="mode-latex">
+                <div class="fgroup">
+                    <div class="flbl-row" style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span class="flbl">Base LaTeX Resume</span>
+                        <span class="flbl-action" style="font-family: var(--mono); font-size: 9px; text-transform: uppercase; color: var(--accent-txt); cursor: pointer; text-decoration: underline;" onclick="document.getElementById('pdf-upload-input').click()">Or upload PDF resume…</span>
+                    </div>
+                    <textarea id="latex-input" rows="12"
+                        placeholder="Paste your full LaTeX resume code here…" oninput="clearPDF()"></textarea>
+                    <input type="file" id="pdf-upload-input" accept=".pdf" style="display: none;" onchange="handlePDFUpload(this)">
+                    <div id="pdf-upload-status" style="font-family: var(--mono); font-size: 10px; color: var(--accent-txt); margin-top: 6px; display: none;"></div>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Job Description</span>
+                    <textarea id="jd-latex" rows="7" placeholder="Paste the full job description here…"></textarea>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Template</span>
+                    <div class="tpl-list" id="tl-latex"></div>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Options</span>
+                    <div class="togs">
+                        <div class="tog-row"><span class="tog-lbl">Generate cover letter</span><label class="tog"><input
+                                    type="checkbox" id="tc-l" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                        <div class="tog-row"><span class="tog-lbl">Show diff vs base</span><label class="tog"><input
+                                    type="checkbox" id="td-l" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                        <div class="tog-row"><span class="tog-lbl">ATS keyword analysis</span><label class="tog"><input
+                                    type="checkbox" id="ta-l" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM MODE -->
+            <div id="mode-form" style="display:none">
+                <div style="border:1px solid var(--hairline);border-radius:var(--r);overflow:hidden;margin-bottom:20px">
+
+                    <div class="sec" style="border-top:none;padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Personal
+                                    Info</span></div>
+                            <span class="chev open">&#9662;</span>
+                        </div>
+                        <div class="sec-body">
+                            <div class="fg">
+                                <div class="ff full"><label>Full Name</label><input type="text" id="f-name"
+                                        placeholder="Your Full Name"></div>
+                                <div class="ff"><label>Phone</label><input type="text" id="f-phone"
+                                        placeholder="+91-XXXXXXXXXX"></div>
+                                <div class="ff"><label>Email</label><input type="text" id="f-email"
+                                        placeholder="you@gmail.com"></div>
+                                <div class="ff"><label>City, State</label><input type="text" id="f-loc"
+                                        placeholder="Bhimavaram, AP"></div>
+                                <div class="ff"><label>LinkedIn URL</label><input type="text" id="f-linkedin"
+                                        placeholder="linkedin.com/in/yourname"></div>
+                                <div class="ff"><label>GitHub URL</label><input type="text" id="f-github"
+                                        placeholder="github.com/yourusername"></div>
+                                <div class="ff full"><label>Portfolio (optional)</label><input type="text"
+                                        id="f-portfolio" placeholder="yourportfolio.com"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Objective</span>
+                            </div>
+                            <span class="chev open">&#9662;</span>
+                        </div>
+                        <div class="sec-body">
+                            <textarea id="f-obj" rows="3"
+                                placeholder="Final year B.Tech CSE student seeking internship roles. Strong in Python, Java, and full-stack development with 3 deployed projects."></textarea>
+                            <span class="hint-txt">2–3 lines. Tailor to every JD.</span>
+                        </div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Education</span>
+                            </div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('edu')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="edu-list"></div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Technical
+                                    Skills</span></div>
+                            <span class="chev open">&#9662;</span>
+                        </div>
+                        <div class="sec-body">
+                            <div class="ff"><label>Languages</label><input type="text" id="f-langs"
+                                    placeholder="Python, Java, C++, JavaScript"></div>
+                            <div class="ff"><label>Frameworks &amp; Libraries</label><input type="text" id="f-fw"
+                                    placeholder="React, Flask, Node.js, Spring Boot"></div>
+                            <div class="ff"><label>Databases</label><input type="text" id="f-db"
+                                    placeholder="MySQL, MongoDB, Firebase, PostgreSQL"></div>
+                            <div class="ff"><label>Tools &amp; Platforms</label><input type="text" id="f-tools"
+                                    placeholder="Git, GitHub, Docker, VS Code, Linux"></div>
+                            <div class="ff"><label>ML / Data Science</label><input type="text" id="f-ml"
+                                    placeholder="NumPy, Pandas, Scikit-learn, TensorFlow"></div>
+                            <div class="ff"><label>Cloud / DevOps</label><input type="text" id="f-cloud"
+                                    placeholder="AWS basics, GCP, CI/CD"></div>
+                        </div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Projects</span>
+                            </div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('proj')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="proj-list"></div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Internships /
+                                    Experience</span></div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('exp')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="exp-list"></div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span
+                                    class="sec-title">Certifications</span></div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('cert')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="cert-list"></div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Achievements
+                                    &amp; Activities</span></div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('ach')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="ach-list"></div>
+                    </div>
+                </div>
+
+                <div class="fgroup">
+                    <span class="flbl">Job Description</span>
+                    <textarea id="jd-form" rows="7" placeholder="Paste the full job description here…"></textarea>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Template</span>
+                    <div class="tpl-list" id="tl-form"></div>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Options</span>
+                    <div class="togs">
+                        <div class="tog-row"><span class="tog-lbl">Generate cover letter</span><label class="tog"><input
+                                    type="checkbox" id="tc-f" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                        <div class="tog-row"><span class="tog-lbl">ATS keyword analysis</span><label class="tog"><input
+                                    type="checkbox" id="ta-f" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── GENERATE BUTTON ── -->
+            <div class="gen-in-options">
+                <button class="run-btn" id="run-btn" onclick="generate()">
+                    <span id="run-ico">⚡</span>
+                    <span id="run-lbl">Generate tailored resume</span>
+                </button>
+            </div>
+
+        </div><!-- /input-zone -->
+
+        <!-- ── OUTPUT ZONE ── -->
+        <div class="output-zone hidden" id="output-zone"></div>
+
+    </div><!-- /site-wrap -->
+
+    <hr class="section-divider">
+
+    <!-- ── FOOTER ── -->
+    <footer class="site-footer">
+        <span class="footer-l">Resume Engineer · Crafted by human</span>
+        <div class="footer-r-group">
+            <a class="footer-r" href="https://github.com/sridattasai18" target="_blank"
+                rel="noopener">github.com/sridattasai18 ↗</a>
+            <a class="footer-sub-link" href="https://github.com/Sridattasai18/Resume-Engineer" target="_blank"
+                rel="noopener">star it if you like it ★</a>
+        </div>
+    </footer>
+
+
+
+    <!-- ── JUMP NAV ── -->
+    <nav class="jump-nav" id="jump-nav">
+        <a class="jlink" href="#ats" onclick="smoothTo('ats')">ATS</a>
+        <a class="jlink" href="#latex-out" onclick="smoothTo('latex-out')">LaTeX</a>
+        <a class="jlink" href="#diff-out" onclick="smoothTo('diff-out')">Diff</a>
+        <a class="jlink" href="#cover-out" onclick="smoothTo('cover-out')">Cover</a>
+        <a class="jlink" href="#preview-out" onclick="smoothTo('preview-out')">Preview</a>
+        <a class="jlink" href="#checklist-out" onclick="smoothTo('checklist-out')">Checklist</a>
+    </nav>
+
+    <script>
+        /* ════════════════════════════════════════
+           PROVIDERS
+        ════════════════════════════════════════ */
+        var PROVIDERS = {
+            openrouter: {
+                label: 'OpenRouter',
+                models: [
+                    { id: 'google/gemini-2.0-flash-001', name: 'Gemini 2.0 Flash' },
+                    { id: 'google/gemini-2.5-flash-preview-05-20', name: 'Gemini 2.5 Flash' },
+                    { id: 'meta-llama/llama-4-maverick', name: 'Llama 4 Maverick' },
+                    { id: 'mistralai/mistral-medium-3', name: 'Mistral Medium 3' },
+                    { id: 'deepseek/deepseek-chat-v3-0324', name: 'DeepSeek Chat v3' }
+                ],
+                call: async function (model, system, user, apiKey) {
+                    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey, 'HTTP-Referer': window.location.href },
+                        body: JSON.stringify({ model: model, max_tokens: 8000, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] })
+                    });
+                    var d = await res.json();
+                    if (d.error) throw new Error(d.error.message || 'OpenRouter error');
+                    return d.choices?.[0]?.message?.content || '';
+                }
+            },
+            claude: {
+                label: 'Claude',
+                models: [
+                    { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },
+                    { id: 'claude-opus-4-20250514', name: 'Claude Opus 4' },
+                    { id: 'claude-haiku-4-5-20251001', name: 'Claude Haiku 4.5' }
+                ],
+                call: async function (model, system, user, apiKey) {
+                    var res = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+                        body: JSON.stringify({ model: model, max_tokens: 8000, system: system, messages: [{ role: 'user', content: user }] })
+                    });
+                    var d = await res.json();
+                    if (d.error) throw new Error(d.error.message || 'Claude API error');
+                    return (d.content || []).filter(function (b) { return b.type === 'text'; }).map(function (b) { return b.text; }).join('');
+                }
+            },
+            gemini: {
+                label: 'Gemini',
+                models: [
+                    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+                    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+                    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' }
+                ],
+                call: async function (model, system, user, apiKey) {
+                    var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            system_instruction: { parts: [{ text: system }] },
+                            contents: [{ role: 'user', parts: [{ text: user }] }]
+                        })
+                    });
+                    var d = await res.json();
+                    if (d.error) throw new Error(d.error.message || 'Gemini API error');
+                    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                }
+            },
+            openai: {
+                label: 'OpenAI',
+                models: [
+                    { id: 'gpt-4o', name: 'GPT-4o' },
+                    { id: 'gpt-4o-mini', name: 'GPT-4o Mini' },
+                    { id: 'o4-mini', name: 'o4-mini' }
+                ],
+                call: async function (model, system, user, apiKey) {
+                    var res = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+                        body: JSON.stringify({ model: model, max_tokens: 8000, messages: [{ role: 'system', content: system }, { role: 'user', content: user }] })
+                    });
+                    var d = await res.json();
+                    if (d.error) throw new Error(d.error.message || 'OpenAI API error');
+                    return d.choices?.[0]?.message?.content || '';
+                }
+            }
+        };
+
+        var selProvider = 'openrouter';
+        var selModel = 'google/gemini-2.0-flash-001';
+
+        function selectKeyProvider(p) {
+            selProvider = p;
+            selModel = PROVIDERS[p].models[0].id;
+            document.querySelectorAll('.kdrop-opt').forEach(function (el) {
+                el.classList.toggle('active', el.getAttribute('data-provider') === p);
+            });
+            updateBadge();
+            loadKey();
+        }
+        function updateBadge() {
+            var p = PROVIDERS[selProvider];
+            var m = p.models.find(function (x) { return x.id === selModel; });
+            var label = p.label + ' · ' + (m ? m.name : selModel.split('/').pop());
+            var btn = document.getElementById('keys-btn');
+            if (btn) btn.textContent = '⚿ ' + label;
+        }
+        function saveKey() {
+            var k = document.getElementById('api-key-input').value.trim();
+            if (k) { try { localStorage.setItem('re-apikey-' + selProvider, k); } catch (e) { } }
+            var btn = document.querySelector('.kdrop-key-btn');
+            if (btn) {
+                var orig = btn.textContent;
+                btn.textContent = 'Saved ✓';
+                btn.style.background = 'var(--accent)';
+                btn.style.color = 'var(--paper)';
+                setTimeout(function () {
+                    btn.textContent = orig;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }, 1500);
+            }
+        }
+
+        // PDF.js Upload and Parsing Logic
+        var uploadedPDFText = '';
+
+        function clearPDF() {
+            uploadedPDFText = '';
+            var status = document.getElementById('pdf-upload-status');
+            if (status) {
+                status.style.display = 'none';
+                status.textContent = '';
+            }
+            var fileInput = document.getElementById('pdf-upload-input');
+            if (fileInput) fileInput.value = '';
+            var txtArea = document.getElementById('latex-input');
+            if (txtArea) txtArea.placeholder = 'Paste your full LaTeX resume code here…';
+        }
+
+        async function handlePDFUpload(input) {
+            var file = input.files[0];
+            if (!file) return;
+
+            var status = document.getElementById('pdf-upload-status');
+            if (status) {
+                status.style.display = 'block';
+                status.style.color = 'var(--muted)';
+                status.textContent = '⏳ Parsing PDF resume…';
+            }
+
+            try {
+                var text = await extractTextFromPDF(file);
+                uploadedPDFText = text;
+                if (status) {
+                    status.style.color = 'var(--accent-txt)';
+                    status.textContent = '📄 ' + file.name + ' parsed successfully (' + text.length + ' chars). Using PDF text.';
+                }
+                var txtArea = document.getElementById('latex-input');
+                if (txtArea) {
+                    txtArea.value = '';
+                    txtArea.placeholder = 'Using content from uploaded PDF: ' + file.name;
+                }
+            } catch (err) {
+                uploadedPDFText = '';
+                if (status) {
+                    status.style.color = 'var(--warn-txt)';
+                    status.textContent = '❌ Failed to parse PDF: ' + err.message;
+                }
+                var txtArea = document.getElementById('latex-input');
+                if (txtArea) txtArea.placeholder = 'Paste your full LaTeX resume code here…';
+            }
+        }
+
+        async function extractTextFromPDF(file) {
+            var reader = new FileReader();
+            return new Promise(function (resolve, reject) {
+                reader.onload = async function () {
+                    try {
+                        var arrayBuffer = this.result;
+                        var pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        var fullText = '';
+                        for (var i = 1; i <= pdf.numPages; i++) {
+                            var page = await pdf.getPage(i);
+                            var textContent = await page.getTextContent();
+                            var pageText = textContent.items.map(function (item) {
+                                return item.str;
+                            }).join(' ');
+                            fullText += pageText + '\n';
+                        }
+                        resolve(fullText);
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                reader.onerror = function () {
+                    reject(new Error('Failed to read file'));
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        function loadKey() {
+            try {
+                var k = localStorage.getItem('re-apikey-' + selProvider) || '';
+                document.getElementById('api-key-input').value = k;
+            } catch (e) { }
+        }
+        async function callAI(system, user) {
+            var apiKey = document.getElementById('api-key-input').value.trim();
+            if (!apiKey) { try { apiKey = localStorage.getItem('re-apikey-' + selProvider) || ''; } catch (e) { } }
+            if (!apiKey) throw new Error('API key required. Click the Keys button in the nav and paste your key.');
+            return PROVIDERS[selProvider].call(selModel, system, user, apiKey);
+        }
+
+        /* ════════════════════════════════════════
+           TEMPLATES
+        ════════════════════════════════════════ */
+        var TPLS = [
+            { id: 'jake-classic', name: 'Jake Classic', desc: 'CS/SWE single-col, letterpaper, ATS gold standard', ats: '5/5', ab: 'ab5', def: true },
+            { id: 'datta-custom', name: 'Datta Custom', desc: 'A4, multi-col skills, India placements', ats: '5/5', ab: 'ab5' },
+            { id: 'tlc-datasci', name: 'Data Science', desc: 'ML / Data Science focused roles', ats: '4/5', ab: 'ab4' },
+            { id: 'harshibar', name: 'Harshibar Modern', desc: 'Sans-serif, icons, stylish', ats: '4/5', ab: 'ab4' },
+            { id: 'anubhav', name: 'Anubhav Detailed', desc: 'Campus placements, India-focused', ats: '3/5', ab: 'ab3' }
+        ];
+        var HINTS = {
+            'jake-classic': "Jake Ryan ATS template. \\documentclass[letterpaper,11pt]{article}. Packages: latexsym, fullpage, titlesec, marvosym, color, verbatim, enumitem, hyperref, fancyhdr, babel. \\pdfgentounicode=1. Single column. \\titlerule section headers. Commands: \\resumeItem{text}, \\resumeSubheading{Company}{Date}{Role}{Location}, \\resumeProjectHeading{\\textbf{Project} $|$ \\emph{Stack}}{Date}. Section order: Education, Technical Skills, Projects, Experience (if any), Certifications (if any), Extracurricular/Achievements (if any). No tables, no graphics, no color.",
+            'datta-custom': "\\documentclass[a4paper,11pt]{article}. \\usepackage[left=0.9cm,right=0.9cm,top=0.6cm,bottom=0.7cm]{geometry}. \\usepackage{enumitem,hyperref,titlesec,parskip,multicol}. \\pagenumbering{gobble}. Section order: Objective, Education, Technical Skills (multicols{2}), Projects, Experience, Certifications, Achievements. Header: centered {\\Large \\textbf{Name}}, contact line.",
+            'tlc-datasci': "Data Science template. a4paper 11pt. Sections: Objective, Technical Skills table (Languages | Libraries | Tools | Databases), Projects (ML-heavy first, include accuracy metrics), Education, Certifications, Activities.",
+            'harshibar': "Harshibar modern: sfdefault font, fontawesome5 icons in header. Single column. Sections: Experience, Projects, Education, Skills.",
+            'anubhav': "Anubhav campus a4. Bold name header. Sections: Education (CGPA table), Skills Summary, Projects, Internships, Certifications, Positions of Responsibility, Achievements."
+        };
+        var STEPS = ['Parsing job description', 'Extracting required keywords', 'Analysing resume gaps', 'Tailoring bullet points', 'Generating LaTeX document', 'Composing cover letter', 'Running ATS simulation'];
+
+        var mode = 'latex', selTpl = 'jake-classic', R = {}, isGen = false, stepTmr = null, lastWD = false;
+        var ec = { edu: 0, exp: 0, proj: 0, cert: 0, ach: 0 };
+
+        /* ════════════════════════════════════════
+           UTILS
+        ════════════════════════════════════════ */
+        function ex(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function gv(id) { var x = document.getElementById(id); return x ? x.value : ''; }
+        function tv(id) { var x = document.getElementById(id); return x ? x.checked : true; }
+        function smoothTo(id) {
+            var el = document.getElementById(id);
+            if (!el) return false;
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            el.classList.remove('scroll-highlight');
+            void el.offsetWidth; /* force reflow to restart animation */
+            el.classList.add('scroll-highlight');
+            setTimeout(function () { el.classList.remove('scroll-highlight'); }, 600);
+            return false;
+        }
+        function scrollToHero() {
+            var hero = document.querySelector('.hero');
+            if (hero) hero.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /* ════════════════════════════════════════
+           THEME
+        ════════════════════════════════════════ */
+        var isDark = false;
+        function toggleTheme() {
+            isDark = !isDark;
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-ico').textContent = isDark ? '☾' : '☀';
+            document.getElementById('theme-lbl').textContent = isDark ? 'Dark' : 'Light';
+            try { localStorage.setItem('re-theme', isDark ? 'dark' : 'light'); } catch (e) { }
+        }
+        (function () {
+            try {
+                var saved = localStorage.getItem('re-theme');
+                if (saved === 'dark') {
+                    isDark = true;
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.getElementById('theme-ico').textContent = '☾';
+                    document.getElementById('theme-lbl').textContent = 'Dark';
+                }
+            } catch (e) { }
+        })();
+
+
+        /* ════════════════════════════════════════
+           TEMPLATE INIT
+        ════════════════════════════════════════ */
+        function initTpls() {
+            ['tl-latex', 'tl-form'].forEach(function (lid) {
+                var c = document.getElementById(lid); if (!c) return;
+                c.innerHTML = TPLS.map(function (t) {
+                    var badge = t.id === 'jake-classic' ? '<span class="ats-badge ab5">ATS</span>' : '';
+                    return '<div class="tpl-item' + (t.def ? ' sel' : '') + '" data-id="' + t.id + '" onclick="pickTpl(this,\'' + lid + '\')">' +
+                        '<div class="tpl-radio"></div>' +
+                        '<div class="tpl-info"><div class="tpl-name">' + t.name + '</div><div class="tpl-desc">' + t.desc + '</div></div>' +
+                        badge + '</div>';
+                }).join('');
+            });
+        }
+        function pickTpl(el, lid) {
+            document.querySelectorAll('#' + lid + ' .tpl-item').forEach(function (r) { r.classList.remove('sel'); });
+            el.classList.add('sel');
+            selTpl = el.dataset.id;
+        }
+
+        /* ════════════════════════════════════════
+           MODE SWITCH
+        ════════════════════════════════════════ */
+        function setMode(m) {
+            mode = m;
+            document.getElementById('mbL').classList.toggle('on', m === 'latex');
+            document.getElementById('mbF').classList.toggle('on', m === 'form');
+            document.getElementById('mode-latex').style.display = m === 'latex' ? 'block' : 'none';
+            document.getElementById('mode-form').style.display = m === 'form' ? 'block' : 'none';
+            var inputZone = document.querySelector('.input-zone');
+            if (inputZone) {
+                inputZone.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        /* ════════════════════════════════════════
+           ACCORDION
+        ════════════════════════════════════════ */
+        function toggleSec(hd) {
+            var body = hd.nextElementSibling;
+            var ch = hd.querySelector('.chev');
+            var isOpen = !body.classList.contains('closed');
+            body.classList.toggle('closed', isOpen);
+            if (ch) ch.classList.toggle('open', !isOpen);
+        }
+
+        /* ════════════════════════════════════════
+           ENTRY CARDS
+        ════════════════════════════════════════ */
+        function addEntry(type) {
+            var list = document.getElementById(type + '-list'); if (!list) return;
+            ec[type]++; var n = ec[type];
+            var uid = type + n + 'x' + Date.now();
+            var card = document.createElement('div'); card.className = 'entry'; card.id = uid;
+            var rm = '<button class="rm" onclick="document.getElementById(\'' + uid + '\').remove()" title="Remove">&#x2715;</button>';
+            var hd = '<div class="entry-hd"><span class="entry-n">' + type + ' 0' + n + '</span>' + rm + '</div>';
+            if (type === 'edu') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff full"><label>Institution</label><input type="text" placeholder="Vishnu Institute of Technology, Bhimavaram"></div>' +
+                    '<div class="ff full"><label>Degree &amp; Branch</label><input type="text" placeholder="B.Tech in Computer Science (AI &amp; DS)"></div>' +
+                    '<div class="ff"><label>Start Year</label><input type="text" placeholder="2023"></div>' +
+                    '<div class="ff"><label>End / Expected</label><input type="text" placeholder="2027 (Expected)"></div>' +
+                    '<div class="ff"><label>CGPA / Percentage</label><input type="text" placeholder="8.33 / 10"></div>' +
+                    '<div class="ff"><label>Location</label><input type="text" placeholder="Bhimavaram, AP"></div>' +
+                    '<div class="ff full"><label>Relevant Coursework</label><input type="text" placeholder="DSA, DBMS, OS, ML, CN, Software Engineering"></div></div>';
+            } else if (type === 'proj') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff"><label>Project Name</label><input type="text" placeholder="AgriVision"></div>' +
+                    '<div class="ff"><label>Tech Stack</label><input type="text" placeholder="Python, Flask, React, Firebase"></div>' +
+                    '<div class="ff"><label>Duration</label><input type="text" placeholder="Jan 2024 - Mar 2024"></div>' +
+                    '<div class="ff"><label>GitHub / Demo Link</label><input type="text" placeholder="github.com/you/agrivision"></div>' +
+                    '<div class="ff full"><label>One-line Description</label><input type="text" placeholder="ML system recommending crops based on soil and weather data"></div>' +
+                    '<div class="ff full"><label>Key Bullets (one per line, action verbs + numbers)</label>' +
+                    '<textarea rows="4" placeholder="Trained Random Forest model achieving 91.4% accuracy&#10;Built REST API with Flask serving 300+ daily predictions&#10;Deployed on Render with 99.7% uptime"></textarea></div></div>';
+            } else if (type === 'exp') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff"><label>Company / Organisation</label><input type="text" placeholder="SmartBridge Educational Services"></div>' +
+                    '<div class="ff"><label>Role</label><input type="text" placeholder="Data Science Intern"></div>' +
+                    '<div class="ff"><label>Duration</label><input type="text" placeholder="May 2025 - Jul 2025"></div>' +
+                    '<div class="ff"><label>Location / Mode</label><input type="text" placeholder="Remote"></div>' +
+                    '<div class="ff full"><label>Key Bullets (one per line, quantify impact)</label>' +
+                    '<textarea rows="4" placeholder="Analysed 50k-row sales dataset with Python and SQL&#10;Built Tableau dashboard adopted by 4 business units&#10;Automated weekly report pipeline, saving 6 hours/week"></textarea></div></div>';
+            } else if (type === 'cert') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff full"><label>Certification &amp; Issuer</label><input type="text" placeholder="Programming in Java - NPTEL (IIT Kharagpur)"></div>' +
+                    '<div class="ff"><label>Platform</label><input type="text" placeholder="NPTEL / Coursera / Kaggle"></div>' +
+                    '<div class="ff"><label>Year</label><input type="text" placeholder="2024"></div></div>';
+            } else if (type === 'ach') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff full"><label>Achievement / Activity</label><input type="text" placeholder="Finalist - Smart India Hackathon 2024 (Internal Round), VIT"></div>' +
+                    '<div class="ff full"><label>Brief Details (optional)</label><input type="text" placeholder="Built AgriVision; top 3 of 40 teams in department"></div></div>';
+            }
+            list.appendChild(card);
+        }
+
+        /* ════════════════════════════════════════
+           BUILD FORM TEXT
+        ════════════════════════════════════════ */
+        function buildForm() {
+            var t = 'NAME: ' + gv('f-name') + '\nPHONE: ' + gv('f-phone') + ' | EMAIL: ' + gv('f-email') + ' | LOCATION: ' + gv('f-loc') + '\nLINKEDIN: ' + gv('f-linkedin') + ' | GITHUB: ' + gv('f-github');
+            var p = gv('f-portfolio'); if (p) t += ' | PORTFOLIO: ' + p;
+            t += '\n\nOBJECTIVE:\n' + gv('f-obj') + '\n\n';
+            document.querySelectorAll('#edu-list .entry').forEach(function (x) {
+                var i = x.querySelectorAll('input');
+                t += 'EDU: ' + i[0].value + ' | ' + i[1].value + ' | ' + i[2].value + ' - ' + i[3].value + ' | CGPA: ' + i[4].value + ' | ' + i[5].value + '\nCoursework: ' + i[6].value + '\n\n';
+            });
+            t += 'SKILLS:\nLanguages: ' + gv('f-langs') + '\nFrameworks: ' + gv('f-fw') + '\nDatabases: ' + gv('f-db') + '\nTools: ' + gv('f-tools') + '\nML/Data: ' + gv('f-ml') + '\nCloud: ' + gv('f-cloud') + '\n\n';
+            document.querySelectorAll('#proj-list .entry').forEach(function (x) {
+                var i = x.querySelectorAll('input'), ta = x.querySelector('textarea');
+                t += 'PROJECT: ' + i[0].value + ' | Stack: ' + i[1].value + ' | ' + i[2].value + ' | ' + i[3].value + '\nDesc: ' + i[4].value + '\n' + (ta ? ta.value : '') + '\n\n';
+            });
+            document.querySelectorAll('#exp-list .entry').forEach(function (x) {
+                var i = x.querySelectorAll('input'), ta = x.querySelector('textarea');
+                t += 'EXPERIENCE: ' + i[0].value + ' | ' + i[1].value + ' | ' + i[2].value + ' | ' + i[3].value + '\n' + (ta ? ta.value : '') + '\n\n';
+            });
+            document.querySelectorAll('#cert-list .entry').forEach(function (x) {
+                var i = x.querySelectorAll('input');
+                t += 'CERT: ' + i[0].value + ' | ' + i[1].value + ' | ' + i[2].value + '\n';
+            }); t += '\n';
+            document.querySelectorAll('#ach-list .entry').forEach(function (x) {
+                var i = x.querySelectorAll('input');
+                t += 'ACHIEVEMENT: ' + i[0].value + ' - ' + i[1].value + '\n';
+            });
+            return t;
+        }
+
+        /* ════════════════════════════════════════
+           SCORE CLASS
+        ════════════════════════════════════════ */
+        function scCls(n, mx) { return n >= mx * 0.8 ? 'hi' : n >= mx * 0.6 ? 'mid' : 'lo'; }
+
+        /* ════════════════════════════════════════
+           RENDER OUTPUTS
+        ════════════════════════════════════════ */
+        function renderAll() {
+            var oz = document.getElementById('output-zone');
+            oz.classList.remove('hidden');
+            oz.innerHTML = '';
+
+            // Diff card only renders when: LaTeX mode + diff toggle ON + AI returned diff data
+            var showDiff = lastWD && (R.diff || []).length > 0;
+
+            var allCards = [
+                { id: 'ats',          num: '01', lbl: 'ATS Report',   fn: buildATS },
+                { id: 'latex-out',    num: '02', lbl: 'LaTeX Code',   fn: buildLatex },
+                { id: 'diff-out',     num: '03', lbl: 'Diff',         fn: buildDiff,      skip: !showDiff },
+                { id: 'cover-out',    num: '04', lbl: 'Cover Letter', fn: buildCover },
+                { id: 'preview-out',  num: '05', lbl: 'PDF Preview',  fn: buildPDF },
+                { id: 'checklist-out',num: '06', lbl: 'Checklist',    fn: buildChecklist }
+            ];
+
+            // Re-number visible cards sequentially
+            var visNum = 0;
+            allCards.forEach(function (c) {
+                if (c.skip) return;
+                visNum++;
+                var num = (visNum < 10 ? '0' : '') + visNum;
+                var div = document.createElement('div');
+                div.className = 'ocard';
+                div.id = c.id;
+                div.style.animationDelay = ((visNum - 1) * 0.06) + 's';
+                div.innerHTML = '<div class="ocard-lbl"><span class="lbl-num">' + num + '</span>' + c.lbl + '</div>' + c.fn();
+                oz.appendChild(div);
+            });
+
+            // Update jump nav — hide Diff link when card is not shown
+            var diffLink = document.querySelector('.jlink[href="#diff-out"]');
+            if (diffLink) diffLink.style.display = showDiff ? 'block' : 'none';
+
+            document.getElementById('jump-nav').classList.add('visible');
+            setTimeout(function () { oz.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+        }
+
+        function buildATS() {
+            var d = R.ats || {}; var ms = d.matchScore || 0, as = d.atsScore || 0;
+            return '<div class="score-grid">' +
+                '<div class="sc ' + scCls(ms, 10) + '"><div class="sc-n">' + ms + '<span style="font-size:22px;color:var(--muted)">/10</span></div><div class="sc-l">JD Match</div><div class="sc-bar"><div class="sc-fill" style="width:' + (ms / 10 * 100) + '%"></div></div></div>' +
+                '<div class="sc ' + scCls(as, 100) + '"><div class="sc-n">' + as + '<span style="font-size:22px;color:var(--muted)">/100</span></div><div class="sc-l">ATS Score</div><div class="sc-bar"><div class="sc-fill" style="width:' + as + '%"></div></div></div>' +
+                '</div>' +
+                '<span class="subsec-lbl">Missing keywords — add these</span>' +
+                '<div class="chips">' + ((d.missingKeywords || []).map(function (k) { return '<span class="chip chip-miss">' + ex(k) + '</span>'; }).join('') || '<span class="chip chip-neu">None — great match</span>') + '</div>' +
+                '<span class="subsec-lbl">Present keywords — already matching</span>' +
+                '<div class="chips">' + ((d.presentKeywords || []).map(function (k) { return '<span class="chip chip-hit">' + ex(k) + '</span>'; }).join('') || '<span class="chip chip-neu">—</span>') + '</div>' +
+                '<span class="subsec-lbl">Analysis</span><div class="atext">' + (d.analysis || '—') + '</div>' +
+                '<span class="subsec-lbl">Skills gaps</span><div class="atext">' + (d.skillsGaps || 'No major gaps identified.') + '</div>';
+        }
+
+        function buildLatex() {
+            return '<div class="code-meta">Template: <span>' + ex(selTpl) + '</span> &nbsp;·&nbsp; Copy to Overleaf, compile, export PDF</div>' +
+                '<div class="code-box">' + ex(R.latex || 'LaTeX will appear here after generation.') + '</div>' +
+                '<button class="cpbtn" id="cb-l" onclick="cpTxt(R.latex,\'cb-l\')">Copy LaTeX code</button>';
+        }
+
+        function buildDiff() {
+            var diff = R.diff || [];
+            if (!diff.length) return '<p class="atext">Enable the diff toggle and run in LaTeX mode to see changes.</p>';
+            return '<div class="diff-box">' + diff.map(function (l) {
+                if (l[0] === '+') return '<div class="dl dla">' + ex(l) + '</div>';
+                if (l[0] === '-') return '<div class="dl dlr">' + ex(l) + '</div>';
+                return '<div class="dl dlc">' + ex(l) + '</div>';
+            }).join('') + '</div>';
+        }
+
+        function buildCover() {
+            var cov = R.cover || '';
+            return '<p class="atext" style="margin-bottom:14px">Personalise the salutation with the hiring manager\'s name if known.</p>' +
+                '<div class="cover-box">' + ex(cov || 'Cover letter will appear here after generation.') + '</div>' +
+                (cov ? '<button class="cpbtn" id="cb-c" onclick="cpTxt(R.cover,\'cb-c\')">Copy cover letter</button>' : '');
+        }
+
+        function buildPDF() {
+            var latex = R.latex || '';
+            if (!latex) return '<div class="pdf-empty">Generate a resume first, then preview it here.</div>';
+            return '<div class="pdf-bar"><span class="pdf-meta">Approximate HTML preview</span>' +
+                '<div class="pdf-actions">' +
+                '<button class="pdf-action" id="pcp" onclick="cpTxt(R.latex,\'pcp\')">Copy LaTeX</button>' +
+                '<button class="pdf-action" onclick="window.open(\'https://www.overleaf.com\',\'_blank\')">Open Overleaf ↗</button>' +
+                '</div></div>' +
+                parsePDF(latex) +
+                '<p class="pdf-hint">Approximate only. Compile on <a href="https://www.overleaf.com" target="_blank">Overleaf</a> for the exact PDF.</p>';
+        }
+
+        function buildChecklist() {
+            var d = R.ats || {}; var ms = d.matchScore || 0, as = d.atsScore || 0;
+            var items = [
+                { t: 'Match score 8/10 or above (yours: ' + ms + '/10)', p: ms >= 8 },
+                { t: 'ATS score 90/100 or above (yours: ' + as + ')', p: as >= 90 },
+                { t: 'LaTeX code generated', p: !!R.latex },
+                { t: 'Fewer than 3 missing keywords', p: (d.missingKeywords || []).length < 3 },
+                { t: 'No tables or graphics (ATS safe)', p: true },
+                { t: 'Cover letter ready', p: !!R.cover }
+            ];
+            var allPass = items.every(function (i) { return i.p; });
+            return '<div class="chk-list">' + items.map(function (i) {
+                return '<div class="ci ' + (i.p ? 'pass' : 'fail') + '"><span class="ci-ico">' + (i.p ? 'pass' : 'fail') + '</span><span class="ci-txt">' + i.t + '</span></div>';
+            }).join('') + '</div>' +
+                '<div class="verdict ' + (allPass ? 'ok' : 'wait') + '">' +
+                (allPass ? 'Ready to apply. Copy the LaTeX, compile on Overleaf, export PDF, and submit.' : 'Not quite ready — review the ATS Report and integrate missing keywords.') +
+                '</div>';
+        }
+
+        /* ════════════════════════════════════════
+           PDF PREVIEW PARSER (preserved exactly)
+        ════════════════════════════════════════ */
+        function parsePDF(latex) {
+            try {
+                var nM = latex.match(/\\Large[^}]*\\textbf\{([^}]+)\}/) || latex.match(/\\textbf\{([A-Z][^}]{2,40})\}/);
+                var name = nM ? nM[1] : 'Your Name';
+                var eM = latex.match(/href\{mailto:[^}]+\}\{([^}]+)\}/);
+                var email = eM ? eM[1] : '';
+                var secs = []; var sr = /\\section\*?\{([^}]+)\}([\s\S]*?)(?=\\section|\\end\{document\})/g; var sm;
+                while ((sm = sr.exec(latex)) !== null) secs.push({ t: sm[1].replace(/\\[a-z]+/g, '').trim(), b: sm[2] });
+                var h = '<div class="pdf-page"><div class="pdf-name">' + ex(name) + '</div><div class="pdf-contact">' + ex(email) + (email ? ' | ' : '') + ' LinkedIn | GitHub</div>';
+                secs.forEach(function (sec) {
+                    h += '<div class="pdf-sec">' + ex(sec.t) + '</div>';
+                    var subs = []; var subR = /\\resumeSubheading\{([^}]+)\}\{([^}]+)\}\{([^}]+)\}\{([^}]*)\}/g; var sbm;
+                    while ((sbm = subR.exec(sec.b)) !== null) subs.push({ o: sbm[1], d: sbm[2], r: sbm[3], l: sbm[4] });
+                    var bullets = []; var bR = /\\resumeItem\{([^}]+)\}|\\item\s+([^\n\\]{4,})/g; var bm;
+                    while ((bm = bR.exec(sec.b)) !== null) { var bt = (bm[1] || bm[2] || '').replace(/\{[^}]*\}/g, '').trim(); if (bt.length > 3) bullets.push(bt); }
+                    if (subs.length) {
+                        subs.forEach(function (s, si) {
+                            h += '<div class="pdf-entry"><div class="pdf-hd"><span>' + ex(s.o) + '</span><span>' + ex(s.d) + '</span></div>' +
+                                '<div class="pdf-sub"><span>' + ex(s.r) + '</span><span>' + ex(s.l) + '</span></div>';
+                            var eb = bullets.slice(si * 3, si * 3 + 3);
+                            if (eb.length) h += '<ul class="pdf-ul">' + eb.map(function (x) { return '<li>' + ex(x.slice(0, 120)) + '</li>'; }).join('') + '</ul>';
+                            h += '</div>';
+                        });
+                    } else if (bullets.length) {
+                        h += '<ul class="pdf-ul">' + bullets.slice(0, 8).map(function (x) { return '<li>' + ex(x.slice(0, 120)) + '</li>'; }).join('') + '</ul>';
+                    } else {
+                        var raw = sec.b.replace(/\\[a-zA-Z]+(\[[^\]]*\])?\{?/g, '').replace(/[{}]/g, '').replace(/\s+/g, ' ').trim().slice(0, 180);
+                        if (raw) h += '<p style="font-size:8.5px;color:#555">' + ex(raw) + '</p>';
+                    }
+                });
+                if (!secs.length) h += '<p style="font-size:9px;text-align:center;color:#888;padding:20px">LaTeX generated — open in Overleaf to render.</p>';
+                return h + '</div>';
+            } catch (e) { return '<div class="pdf-empty">LaTeX generated — open in Overleaf for accurate rendering.</div>'; }
+        }
+
+        /* ════════════════════════════════════════
+           COPY TO CLIPBOARD
+        ════════════════════════════════════════ */
+        function cpTxt(text, id) {
+            navigator.clipboard.writeText(text || '').then(function () {
+                var b = document.getElementById(id); if (!b) return;
+                var orig = b.textContent; b.textContent = 'Copied ✓'; b.classList.add('ok');
+                setTimeout(function () { b.textContent = orig; b.classList.remove('ok'); }, 2000);
+            });
+        }
+
+        /* ════════════════════════════════════════
+           LOADING ANIMATION
+        ════════════════════════════════════════ */
+        function showLoading() {
+            var oz = document.getElementById('output-zone');
+            oz.classList.remove('hidden');
+            oz.innerHTML = '<div class="loading-zone">' +
+                '<div class="ls-eyebrow">— Working on it</div>' +
+                '<ul class="ls-steps">' +
+                STEPS.map(function (s, i) {
+                    return '<li class="ls-step" id="st' + i + '"><span class="ls-step-n">0' + (i + 1) + '</span><span>' + s + '</span></li>';
+                }).join('') + '</ul></div>';
+            oz.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            var s = 0; if (stepTmr) clearInterval(stepTmr);
+            stepTmr = setInterval(function () {
+                if (s > 0) { var p = document.getElementById('st' + (s - 1)); if (p) { p.classList.remove('on'); p.classList.add('done'); } }
+                var c = document.getElementById('st' + s); if (c) c.classList.add('on');
+                s++; if (s >= STEPS.length) clearInterval(stepTmr);
+            }, 2600);
+        }
+
+        /* ════════════════════════════════════════
+           GENERATE
+        ════════════════════════════════════════ */
+        async function generate() {
+            if (isGen) return;
+            var isL = mode === 'latex';
+            var jd = (isL ? gv('jd-latex') : gv('jd-form')).trim();
+            
+            var resume = '';
+            var isPDF = false;
+            if (isL) {
+                if (uploadedPDFText) {
+                    resume = uploadedPDFText;
+                    isPDF = true;
+                } else {
+                    resume = gv('latex-input').trim();
+                }
+            } else {
+                resume = buildForm().trim();
+            }
+
+            if (!jd) { alert('Please paste a job description first.'); return; }
+            if (!resume) { alert(isL ? 'Please paste your LaTeX resume or upload a PDF.' : 'Please fill in at least your basic details.'); return; }
+
+            var apiKey = document.getElementById('api-key-input').value.trim();
+            if (!apiKey) { try { apiKey = localStorage.getItem('re-apikey-' + selProvider) || ''; } catch (e) { } }
+            if (!apiKey) { alert('API key required. Click the Keys button in the nav and paste your key.'); return; }
+
+            isGen = true; R = {};
+            var btn = document.getElementById('run-btn');
+            btn.disabled = true;
+            document.getElementById('run-ico').innerHTML = '<span class="spin"></span>';
+            document.getElementById('run-lbl').textContent = 'Generating…';
+
+            var tp = document.getElementById('top-prog');
+            tp.style.width = '0%'; tp.classList.add('live');
+
+            showLoading();
+            setTimeout(function () { tp.style.width = '30%'; }, 200);
+
+            var wC = tv(isL ? 'tc-l' : 'tc-f');
+            var wD = isPDF ? false : (isL && tv('td-l'));
+            lastWD = wD; // store for renderAll to reference
+            var hint = HINTS[selTpl] || HINTS['jake-classic'];
+
+            var resumeType = isPDF ? "plain text extracted from PDF" : (isL ? "LaTeX" : "form data");
+            var sys = "You are an expert resume engineer and ATS specialist for early-career/fresher candidates.\n\nTEMPLATE:\n" + hint + "\n\nRespond ONLY with a single valid JSON object. No markdown fences, no preamble.\n\nSchema: {\"ats\":{\"matchScore\":<1-10>,\"atsScore\":<1-100>,\"missingKeywords\":[],\"presentKeywords\":[],\"analysis\":\"<HTML ul/li/strong>\",\"skillsGaps\":\"<HTML>\"},\"latex\":\"<complete LaTeX - backslashes doubled as \\\\\\\\, newlines as \\\\n>\",\"diff\":[],\"cover\":\"<~180 word plain text or empty string>\"}\n\nRules: strong action verbs, quantify every bullet, integrate missing keywords naturally, keep to ONE PAGE. wantCover=" + wC + ". wantDiff=" + wD + ". Set cover to empty string if false, diff to empty array if false." + (isPDF ? " IMPORTANT: The candidate has provided their base resume in plain text. Format the final tailored resume entirely into the specified LaTeX template structure." : "");
+            var usr = "RESUME (" + resumeType + "):\n" + resume + "\n\nJOB DESCRIPTION:\n" + jd + "\n\nGenerate JSON.";
+
+            try {
+                var raw = await callAI(sys, usr);
+                tp.style.width = '88%';
+                var parsed;
+                try { parsed = JSON.parse(raw); }
+                catch (_) { var m = raw.match(/\{[\s\S]*\}/); if (m) parsed = JSON.parse(m[0]); else throw new Error('Could not parse response — please try again.'); }
+                R = parsed;
+                tp.style.width = '100%';
+                setTimeout(function () {
+                    tp.style.width = '0%'; tp.classList.remove('live');
+                }, 500);
+            } catch (err) {
+                R = { ats: { matchScore: 0, atsScore: 0, missingKeywords: [], presentKeywords: [], analysis: '<strong>Error:</strong> ' + ex(err.message), skillsGaps: '' }, latex: '', diff: [], cover: '' };
+                tp.style.width = '0%'; tp.classList.remove('live');
+            }
+
+            if (stepTmr) clearInterval(stepTmr);
+            isGen = false;
+            btn.disabled = false;
+            document.getElementById('run-ico').textContent = '⚡';
+            document.getElementById('run-lbl').textContent = 'Generate tailored resume';
+            renderAll();
+        }
+
+        /* ════════════════════════════════════════
+           INIT
+        ════════════════════════════════════════ */
+        (function init() {
+            // Default: Gemini · Gemini 2.0 Flash
+            selProvider = 'gemini';
+            selModel = 'gemini-2.0-flash';
+            updateBadge();
+            loadKey();
+            initTpls();
+            ['edu', 'proj', 'cert', 'ach'].forEach(function (t) { addEntry(t); });
+
+            // Toggle keys dropdown on click
+            var keysWrap = document.querySelector('.keys-btn-wrap');
+            var keysBtn = document.getElementById('keys-btn');
+            if (keysBtn && keysWrap) {
+                keysBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    keysWrap.classList.toggle('open');
+                });
+                var keysDropdown = keysWrap.querySelector('.keys-dropdown');
+                if (keysDropdown) {
+                    keysDropdown.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                    });
+                }
+                document.addEventListener('click', function () {
+                    keysWrap.classList.remove('open');
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

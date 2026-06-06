@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Resume Engineer — paste your LaTeX or build from scratch, add a job description, and get a fully tailored resume with ATS keyword analysis, cover letter, and PDF preview. All in one shot.">
+    <title>Resume Engineer — ATS-Optimised Resume Tailoring</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <!-- ── TOP PROGRESS ── -->
+    <div class="top-progress">
+        <div class="prog-fill" id="top-prog"></div>
+    </div>
+
+    <!-- ── NAV ── -->
+    <nav class="site-nav">
+        <div class="brand" onclick="scrollToHero()">
+            <span class="brand-name">Resume <em>Engineer</em></span>
+            <span class="brand-sep"></span>
+            <span class="brand-tag">ATS-Optimised</span>
+        </div>
+        <div class="nav-mid">
+            <button class="ntab on" id="mbL" onclick="setMode('latex')">LaTeX mode</button>
+            <button class="ntab" id="mbF" onclick="setMode('form')">Build from scratch</button>
+        </div>
+        <div class="nav-r">
+            <!-- ── KEYS DROPDOWN ── -->
+            <div class="keys-btn-wrap">
+                <button class="keys-btn" id="keys-btn">⚿ Keys</button>
+                <div class="keys-dropdown">
+                    <span class="kdrop-lbl">Provider</span>
+                    <div class="kdrop-options">
+                        <div class="kdrop-opt" id="kopt-openrouter" data-provider="openrouter"
+                            onclick="selectKeyProvider('openrouter')">OpenRouter</div>
+                        <div class="kdrop-opt active" id="kopt-gemini" data-provider="gemini"
+                            onclick="selectKeyProvider('gemini')">Gemini</div>
+                    </div>
+                    <span class="kdrop-key-lbl">API Key</span>
+                    <div class="kdrop-key-row">
+                        <input type="password" class="gen-key" id="api-key-input"
+                            placeholder="Paste your key here…">
+                        <button class="kdrop-key-btn" onclick="saveKey()">Save</button>
+                    </div>
+                </div>
+            </div>
+            <button class="theme-btn" onclick="toggleTheme()">
+                <span class="theme-ico" id="theme-ico">☀</span>
+                <span id="theme-lbl">Light</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <section class="hero">
+        <div class="hero-eyebrow">— Resume Engineer · ATS-Optimised</div>
+        <h1 class="hero-h1">Your tailored resume,<br><em>built to clear the machine.</em></h1>
+        <p class="hero-sub">Paste your LaTeX or fill out the form, add a job description, pick a template — and get a
+            fully tailored resume with ATS keyword analysis, a diff against your base, a cover letter, and a live PDF
+            preview. All in one shot.</p>
+    </section>
+
+    <!-- ── MAIN CONTENT ── -->
+    <div class="site-wrap">
+
+        <!-- ── INPUT ZONE ── -->
+        <div class="input-zone">
+            <div class="iz-head">Input</div>
+
+            <!-- LATEX MODE -->
+            <div id="mode-latex">
+                <div class="fgroup">
+                    <div class="flbl-row" style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span class="flbl">Base LaTeX Resume</span>
+                        <span class="flbl-action" style="font-family: var(--mono); font-size: 9px; text-transform: uppercase; color: var(--accent-txt); cursor: pointer; text-decoration: underline;" onclick="document.getElementById('pdf-upload-input').click()">Or upload PDF resume…</span>
+                    </div>
+                    <textarea id="latex-input" rows="12"
+                        placeholder="Paste your full LaTeX resume code here…" oninput="clearPDF()"></textarea>
+                    <input type="file" id="pdf-upload-input" accept=".pdf" style="display: none;" onchange="handlePDFUpload(this)">
+                    <div id="pdf-upload-status" style="font-family: var(--mono); font-size: 10px; color: var(--accent-txt); margin-top: 6px; display: none;"></div>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Job Description</span>
+                    <textarea id="jd-latex" rows="7" placeholder="Paste the full job description here…"></textarea>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Template</span>
+                    <div class="tpl-list" id="tl-latex"></div>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Options</span>
+                    <div class="togs">
+                        <div class="tog-row"><span class="tog-lbl">Generate cover letter</span><label class="tog"><input
+                                    type="checkbox" id="tc-l" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                        <div class="tog-row"><span class="tog-lbl">Show diff vs base</span><label class="tog"><input
+                                    type="checkbox" id="td-l" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                        <div class="tog-row"><span class="tog-lbl">ATS keyword analysis</span><label class="tog"><input
+                                    type="checkbox" id="ta-l" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM MODE -->
+            <div id="mode-form" style="display:none">
+                <div style="border:1px solid var(--hairline);border-radius:var(--r);overflow:hidden;margin-bottom:20px">
+
+                    <div class="sec" style="border-top:none;padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Personal
+                                    Info</span></div>
+                            <span class="chev open">&#9662;</span>
+                        </div>
+                        <div class="sec-body">
+                            <div class="fg">
+                                <div class="ff full"><label>Full Name</label><input type="text" id="f-name"
+                                        placeholder="Your Full Name"></div>
+                                <div class="ff"><label>Phone</label><input type="text" id="f-phone"
+                                        placeholder="+91-XXXXXXXXXX"></div>
+                                <div class="ff"><label>Email</label><input type="text" id="f-email"
+                                        placeholder="you@gmail.com"></div>
+                                <div class="ff"><label>City, State</label><input type="text" id="f-loc"
+                                        placeholder="Bhimavaram, AP"></div>
+                                <div class="ff"><label>LinkedIn URL</label><input type="text" id="f-linkedin"
+                                        placeholder="linkedin.com/in/yourname"></div>
+                                <div class="ff"><label>GitHub URL</label><input type="text" id="f-github"
+                                        placeholder="github.com/yourusername"></div>
+                                <div class="ff full"><label>Portfolio (optional)</label><input type="text"
+                                        id="f-portfolio" placeholder="yourportfolio.com"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span
+                                    class="sec-title">Objective</span>
+                            </div>
+                            <span class="chev open">&#9662;</span>
+                        </div>
+                        <div class="sec-body">
+                            <textarea id="f-obj" rows="3"
+                                placeholder="Final year B.Tech CSE student seeking internship roles. Strong in Python, Java, and full-stack development with 3 deployed projects."></textarea>
+                            <span class="hint-txt">2–3 lines. Tailor to every JD.</span>
+                        </div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span
+                                    class="sec-title">Education</span>
+                            </div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('edu')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="edu-list"></div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Technical
+                                    Skills</span></div>
+                            <span class="chev open">&#9662;</span>
+                        </div>
+                        <div class="sec-body">
+                            <div class="ff"><label>Languages</label><input type="text" id="f-langs"
+                                    placeholder="Python, Java, C++, JavaScript"></div>
+                            <div class="ff"><label>Frameworks &amp; Libraries</label><input type="text" id="f-fw"
+                                    placeholder="React, Flask, Node.js, Spring Boot"></div>
+                            <div class="ff"><label>Databases</label><input type="text" id="f-db"
+                                    placeholder="MySQL, MongoDB, Firebase, PostgreSQL"></div>
+                            <div class="ff"><label>Tools &amp; Platforms</label><input type="text" id="f-tools"
+                                    placeholder="Git, GitHub, Docker, VS Code, Linux"></div>
+                            <div class="ff"><label>ML / Data Science</label><input type="text" id="f-ml"
+                                    placeholder="NumPy, Pandas, Scikit-learn, TensorFlow"></div>
+                            <div class="ff"><label>Cloud / DevOps</label><input type="text" id="f-cloud"
+                                    placeholder="AWS basics, GCP, CI/CD"></div>
+                        </div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span
+                                    class="sec-title">Projects</span>
+                            </div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('proj')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="proj-list"></div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Internships /
+                                    Experience</span></div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('exp')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="exp-list"></div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span
+                                    class="sec-title">Certifications</span></div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('cert')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="cert-list"></div>
+                    </div>
+
+                    <div class="sec" style="padding:0 14px">
+                        <div class="sec-hd" onclick="toggleSec(this)">
+                            <div class="sec-hd-l"><span class="sec-dot"></span><span class="sec-title">Achievements
+                                    &amp; Activities</span></div>
+                            <div class="sec-hd-r"><button class="sec-add"
+                                    onclick="event.stopPropagation();addEntry('ach')">+ add</button><span
+                                    class="chev open">&#9662;</span></div>
+                        </div>
+                        <div class="sec-body" id="ach-list"></div>
+                    </div>
+                </div>
+
+                <div class="fgroup">
+                    <span class="flbl">Job Description</span>
+                    <textarea id="jd-form" rows="7" placeholder="Paste the full job description here…"></textarea>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Template</span>
+                    <div class="tpl-list" id="tl-form"></div>
+                </div>
+                <div class="fgroup">
+                    <span class="flbl">Options</span>
+                    <div class="togs">
+                        <div class="tog-row"><span class="tog-lbl">Generate cover letter</span><label class="tog"><input
+                                    type="checkbox" id="tc-f" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                        <div class="tog-row"><span class="tog-lbl">ATS keyword analysis</span><label class="tog"><input
+                                    type="checkbox" id="ta-f" checked>
+                                <div class="tog-tr"></div>
+                                <div class="tog-th"></div>
+                            </label></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── GENERATE BUTTON ── -->
+            <div class="gen-in-options">
+                <button class="run-btn" id="run-btn" onclick="generate()">
+                    <span id="run-ico">⚡</span>
+                    <span id="run-lbl">Generate tailored resume</span>
+                </button>
+            </div>
+
+        </div><!-- /input-zone -->
+
+        <!-- ── OUTPUT ZONE ── -->
+        <div class="output-zone hidden" id="output-zone"></div>
+
+    </div><!-- /site-wrap -->
+
+    <hr class="section-divider">
+
+    <!-- ── FOOTER ── -->
+    <footer class="site-footer">
+        <span class="footer-l">Resume Engineer · Crafted by human</span>
+        <div class="footer-r-group">
+            <a class="footer-r" href="https://github.com/sridattasai18" target="_blank"
+                rel="noopener">github.com/sridattasai18 ↗</a>
+            <a class="footer-sub-link" href="https://github.com/Sridattasai18/Resume-Engineer" target="_blank"
+                rel="noopener">star it if you like it ★</a>
+        </div>
+    </footer>
+
+    <!-- ── JUMP NAV ── -->
+    <nav class="jump-nav" id="jump-nav">
+        <a class="jlink" href="#ats" onclick="smoothTo('ats')">ATS</a>
+        <a class="jlink" href="#latex-out" onclick="smoothTo('latex-out')">LaTeX</a>
+        <a class="jlink" href="#diff-out" onclick="smoothTo('diff-out')">Diff</a>
+        <a class="jlink" href="#cover-out" onclick="smoothTo('cover-out')">Cover</a>
+        <a class="jlink" href="#preview-out" onclick="smoothTo('preview-out')">Preview</a>
+        <a class="jlink" href="#checklist-out" onclick="smoothTo('checklist-out')">Checklist</a>
+    </nav>
+
+    <!-- Script deferred so DOM is ready -->
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+
+</body>
+
+</html>
