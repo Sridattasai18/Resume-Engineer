@@ -1,4 +1,4 @@
-# Resume Engineer ⚡
+# Resume Engineer
 
 > **Tailor your resume to clear the ATS machine in one shot.**
 
@@ -6,7 +6,7 @@ Resume Engineer is an interactive AI-powered resume customization assistant desi
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## Architecture & Tech Stack
 
 Following a robust backend refactor, the application uses a structured client-server architecture:
 
@@ -17,7 +17,7 @@ Following a robust backend refactor, the application uses a structured client-se
 
 ---
 
-## 🔒 Security First: Key Handling
+## Security First: Key Handling
 
 Your API keys are safe. 
 - Local keys are saved directly in your browser's `localStorage` and never stored on the server.
@@ -26,7 +26,7 @@ Your API keys are safe.
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 RE-V2/
@@ -43,7 +43,7 @@ RE-V2/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -86,7 +86,7 @@ The application will start on **`http://127.0.0.1:5000`**. Open it in your brows
 
 ---
 
-## 📝 Features & Usage
+## Features & Usage
 
 1. **Upload or Paste**:
    - In **LaTeX mode**, paste your base LaTeX resume code, or click **Or upload PDF resume…** to upload a PDF.
