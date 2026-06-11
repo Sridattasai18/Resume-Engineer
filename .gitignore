@@ -1,5 +1,5 @@
-# Exclude v2 folder
-v2/
+# Exclude development version folders
+Version4/
 
 # Python compiled files
 __pycache__/
