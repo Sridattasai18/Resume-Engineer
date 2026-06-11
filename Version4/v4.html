@@ -1,0 +1,2437 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Engineer — AI-Powered Resume Tailoring</title>
+    <meta name="description" content="Paste your LaTeX resume or build from scratch. AI tailors it to any job description, runs ATS simulation, and writes a cover letter — in seconds.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- PDF.js for client-side PDF text extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+        :root,[data-theme="light"]{
+            --paper:#FBFBFA;--paper2:#F4F3F0;--paper3:#EEECEA;
+            --ink:#1A1A19;--ink-soft:#555452;--muted:#828079;
+            --hairline:#E5E3DE;--hairline2:#EFEDE8;
+            --accent:#346538;--accent-bg:#EDF3EC;--accent-txt:#24492A;
+            --warn:#9F2F2D;--warn-bg:#FDEBEC;--warn-txt:#7A1E1C;
+            --amber-bg:#FFF8E7;--amber-txt:#7A5700;
+            --shadow:0 4px 24px rgba(0,0,0,.08);
+            --modal-bg:rgba(26,26,25,.5);
+            --blue-bg:#E8F0FE;--blue-txt:#1A73E8;--blue-border:#1A73E8;
+        }
+        [data-theme="dark"]{
+            --paper:#141412;--paper2:#1C1C1A;--paper3:#252522;
+            --ink:#F0EFEA;--ink-soft:#A8A59E;--muted:#6B6860;
+            --hairline:#2E2D2A;--hairline2:#252522;
+            --accent:#5BAF60;--accent-bg:#1A2E1B;--accent-txt:#7DCE82;
+            --warn:#E06666;--warn-bg:#2E1A1A;--warn-txt:#F0A0A0;
+            --amber-bg:#2A2210;--amber-txt:#D4A843;
+            --shadow:0 4px 24px rgba(0,0,0,.3);
+            --modal-bg:rgba(0,0,0,.7);
+            --blue-bg:#1B2B48;--blue-txt:#8AB4F8;--blue-border:#8AB4F8;
+        }
+        :root{
+            --serif:'Instrument Serif',Georgia,serif;
+            --sans:'Inter Tight',system-ui,sans-serif;
+            --mono:'JetBrains Mono',ui-monospace,monospace;
+            --ease:cubic-bezier(.16,1,.3,1)
+        }
+
+        html,body{font-family:var(--sans);background:var(--paper);color:var(--ink);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+        /* ── NAV ── */
+        nav{position:sticky;top:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:12px 32px;border-bottom:1px solid var(--hairline);backdrop-filter:blur(12px);background:rgba(251,251,250,.92)}
+        [data-theme="dark"] nav{background:rgba(20,20,18,.92)}
+        .brand{display:flex;align-items:baseline;gap:10px;text-decoration:none}
+        .brand-name{font-family:var(--serif);font-size:18px;letter-spacing:-.025em;color:var(--ink);font-weight:400}
+        .brand-name em{font-style:italic;color:var(--accent)}
+        .brand-sep{width:1px;height:12px;background:var(--hairline);align-self:center}
+        .brand-tag{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+        .nav-mid{display:flex;border:1px solid var(--hairline);border-radius:3px;overflow:hidden}
+        .ntab{padding:4px 14px;font-size:11px;font-weight:500;cursor:pointer;background:transparent;border:none;color:var(--muted);border-right:1px solid var(--hairline);letter-spacing:.01em;transition:all .12s;font-family:var(--sans)}
+        .ntab:last-child{border-right:none}
+        .ntab.on{background:var(--ink);color:var(--paper)}
+        .ntab:hover:not(.on){background:var(--paper2);color:var(--ink)}
+        .nav-r{display:flex;align-items:center;gap:8px}
+        .nav-btn{display:flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid var(--hairline);border-radius:3px;background:transparent;color:var(--ink-soft);font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;transition:all .12s}
+        .nav-btn:hover{border-color:var(--ink-soft);color:var(--ink)}
+        .provider-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+        /* ── PROGRESS ── */
+        .prog-rail{position:fixed;top:52px;left:0;right:0;height:2px;background:transparent;z-index:899}
+        .prog-fill{height:100%;width:0;transition:width .35s var(--ease);background:var(--ink)}
+        .prog-fill.live{background:linear-gradient(90deg,var(--ink) 0%,var(--accent) 50%,var(--ink) 100%);background-size:200% 100%;animation:sweep 1.5s linear infinite}
+        @keyframes sweep{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+        @keyframes fadein{from{opacity:0}to{opacity:1}}
+
+        /* ── MODAL ── */
+        .modal-overlay{position:fixed;inset:0;background:var(--modal-bg);z-index:1000;display:flex;align-items:center;justify-content:center;animation:fadein .18s ease;padding:16px}
+        .modal-overlay.hidden{display:none}
+        .modal{background:var(--paper);border:1px solid var(--hairline);border-radius:8px;padding:32px;width:100%;max-width:480px;box-shadow:var(--shadow);animation:fadeup .22s var(--ease)}
+        .modal-head{font-family:var(--serif);font-size:26px;letter-spacing:-.02em;color:var(--ink);margin-bottom:6px;font-weight:400}
+        .modal-sub{font-size:12.5px;color:var(--muted);margin-bottom:28px;line-height:1.5}
+        .modal-label{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;margin-top:16px}
+        .modal-label:first-of-type{margin-top:0}
+        .provider-tabs{display:flex;border:1px solid var(--hairline);border-radius:3px;overflow:hidden;margin-bottom:4px}
+        .ptab{flex:1;padding:7px 4px;background:transparent;border:none;color:var(--muted);font-size:11.5px;font-weight:500;cursor:pointer;border-right:1px solid var(--hairline);transition:all .12s;font-family:var(--sans);text-align:center}
+        .ptab:last-child{border-right:none}
+        .ptab.on{background:var(--ink);color:var(--paper)}
+        .ptab:hover:not(.on){background:var(--paper2);color:var(--ink)}
+        .modal-input{width:100%;padding:9px 11px;border:1px solid var(--hairline);border-radius:3px;background:var(--paper2);color:var(--ink);font-family:var(--mono);font-size:12px;outline:none;transition:border-color .12s}
+        .modal-input:focus{border-color:var(--ink-soft);box-shadow:0 0 0 2.5px rgba(26,26,25,.06)}
+        .modal-input::placeholder{color:var(--muted)}
+        select.modal-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='%23828079'><path d='M0 0l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 10px 6px;
+            padding-right: 32px;
+        }
+        .modal-hint{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4}
+        .modal-hint a{color:var(--accent-txt);text-decoration:none}
+        .modal-hint a:hover{text-decoration:underline}
+        .modal-actions{display:flex;gap:10px;margin-top:24px}
+        .modal-save{flex:1;padding:10px;border:1px solid var(--ink);border-radius:3px;background:var(--ink);color:var(--paper);font-family:var(--sans);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s}
+        .modal-save:hover{background:#2A2A28}
+        .modal-cancel{padding:10px 16px;border:1px solid var(--hairline);border-radius:3px;background:transparent;color:var(--muted);font-family:var(--sans);font-size:12.5px;cursor:pointer;transition:all .12s}
+        .modal-cancel:hover{border-color:var(--ink-soft);color:var(--ink)}
+        .modal-warn{background:var(--warn-bg);border:1px solid var(--warn);border-radius:3px;padding:9px 12px;font-size:11.5px;color:var(--warn-txt);margin-top:12px;line-height:1.5;display:none}
+
+        /* ── HERO ── */
+        .hero{padding:72px 32px 64px;text-align:center;border-bottom:1px solid var(--hairline)}
+        .hero-pre{font-family:var(--mono);font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+        .hero-head{font-family:var(--serif);font-size:clamp(42px,6vw,68px);line-height:1.06;letter-spacing:-.03em;color:var(--ink);margin-bottom:20px;font-weight:400}
+        .hero-head em{font-style:italic;color:var(--ink-soft)}
+        .hero-sub{font-size:15px;color:var(--ink-soft);line-height:1.72;max-width:520px;margin:0 auto 32px}
+        .hero-badges{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+        .badge{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--hairline);color:var(--muted);background:var(--paper2)}
+
+        /* ── LAYOUT ── */
+        .container{max-width:860px;margin:0 auto;padding:0 32px}
+        .section{padding:64px 0;border-top:1px solid var(--hairline)}
+        .sec-pre{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+        .sec-head{font-family:var(--serif);font-size:clamp(30px,4vw,44px);color:var(--ink);line-height:1.1;letter-spacing:-.02em;margin-bottom:24px;font-weight:400}
+
+        /* How-it-works cards */
+        .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--hairline);border-radius:6px;overflow:hidden;background:var(--hairline);margin-top:28px}
+        .card{background:var(--paper);padding:24px}
+        .card-num{font-family:var(--serif);font-size:36px;color:var(--accent);line-height:1;margin-bottom:12px;font-weight:400;opacity:.7}
+        .card-head{font-family:var(--serif);font-size:17px;color:var(--ink);margin-bottom:8px;font-weight:400}
+        .card-body{font-size:12.5px;color:var(--ink-soft);line-height:1.65}
+        .tips{background:var(--accent-bg);border:1px solid var(--accent);border-radius:6px;padding:24px 28px;margin-top:28px}
+        .tips-head{font-family:var(--serif);font-size:17px;color:var(--accent-txt);margin-bottom:14px;font-weight:400}
+        .tips-list{list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+        .tips-list li{font-size:12.5px;color:var(--ink-soft);padding-left:18px;position:relative;line-height:1.5}
+        .tips-list li::before{content:'✓';position:absolute;left:0;color:var(--accent-txt);font-weight:600}
+
+        /* ── INPUT SECTION ── */
+        .input-section{background:var(--paper2);padding:48px 0;border-top:1px solid var(--hairline)}
+        .form-group{margin-bottom:22px}
+        .form-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px}
+        textarea,input[type=text],input[type=password]{width:100%;padding:9px 11px;border:1px solid var(--hairline);border-radius:3px;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .12s;line-height:1.5}
+        textarea{resize:vertical;font-family:var(--mono);font-size:11.5px;line-height:1.65}
+        textarea:focus,input:focus{border-color:var(--ink-soft);box-shadow:0 0 0 2.5px rgba(26,26,25,.06)}
+        [data-theme="dark"] textarea:focus,[data-theme="dark"] input:focus{box-shadow:0 0 0 2.5px rgba(240,239,234,.06)}
+        textarea::placeholder,input::placeholder{color:var(--muted)}
+
+        /* JD Fallback Field Styling */
+        .jd-fallback-fields {
+            animation: fadeup 0.22s var(--ease) both;
+            border-left: 2px solid var(--hairline);
+            padding-left: 12px;
+            margin-top: 14px;
+        }
+
+        /* Accordion */
+        .acc{border:1px solid var(--hairline);border-radius:4px;overflow:hidden;margin-bottom:10px;background:var(--paper)}
+        .acc-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;user-select:none;transition:background .1s}
+        .acc-hd:hover{background:var(--paper2)}
+        .acc-hd-l{display:flex;align-items:center;gap:8px}
+        .acc-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0}
+        .acc-title{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft)}
+        .acc-hd-r{display:flex;align-items:center;gap:8px}
+        .acc-add{font-size:11px;padding:2px 9px;border:1px solid var(--hairline);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;font-family:var(--sans);transition:all .1s}
+        .acc-add:hover{border-color:var(--ink-soft);color:var(--ink)}
+        .acc-chev{font-size:9px;color:var(--muted);transition:transform .18s;line-height:1}
+        .acc-chev.open{transform:rotate(180deg)}
+        .acc-body{padding:14px;display:none;flex-direction:column;gap:9px}
+        .acc-body.show{display:flex}
+
+        /* Entry cards */
+        .ecard{background:var(--paper2);border:1px solid var(--hairline);border-radius:3px;padding:11px}
+        .ecard-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+        .ecard-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+        .ecard-rm{width:18px;height:18px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;border-radius:2px;transition:all .1s}
+        .ecard-rm:hover{background:var(--warn-bg);color:var(--warn)}
+        .fg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+        .full{grid-column:1/-1}
+        .ff{display:flex;flex-direction:column;gap:2px}
+        .ff label{font-size:10.5px;color:var(--muted)}
+        .ff input,.ff textarea{font-size:12px}
+
+        /* Templates */
+        .tpl-list{border:1px solid var(--hairline);border-radius:3px;overflow:hidden}
+        .tpl-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--paper);cursor:pointer;border-bottom:1px solid var(--hairline);transition:background .1s}
+        .tpl-item:last-child{border-bottom:none}
+        .tpl-item:hover{background:var(--paper3)}
+        .tpl-item.sel{background:var(--accent-bg)}
+        .tpl-radio{width:6px;height:6px;border-radius:50%;border:1.5px solid var(--hairline);flex-shrink:0;transition:all .1s}
+        .tpl-item.sel .tpl-radio{background:var(--accent);border-color:var(--accent)}
+        .tpl-meta{flex:1;min-width:0}
+        .tpl-name{font-size:12px;font-weight:500;color:var(--ink)}
+        .tpl-item.sel .tpl-name{color:var(--accent-txt)}
+        .tpl-desc{font-size:10.5px;color:var(--muted);margin-top:1px}
+        .tpl-badge{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:999px;flex-shrink:0}
+        .ab5{background:var(--accent-bg);color:var(--accent-txt);border:1px solid var(--accent)}
+        .ab4{background:var(--amber-bg);color:var(--amber-txt)}
+        .ab3{background:var(--warn-bg);color:var(--warn-txt)}
+
+        /* Toggles */
+        .tog-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--paper);border:1px solid var(--hairline);border-radius:3px;margin-bottom:6px}
+        .tog-row:last-child{margin-bottom:0}
+        .tog-lbl{font-size:12.5px;color:var(--ink-soft)}
+        .tog{position:relative;width:32px;height:17px;flex-shrink:0}
+        .tog input{opacity:0;width:0;height:0}
+        .tog-tr{position:absolute;inset:0;border-radius:9px;background:var(--hairline2);border:1px solid var(--hairline);cursor:pointer;transition:.18s}
+        .tog input:checked+.tog-tr{background:var(--ink);border-color:var(--ink)}
+        .tog-th{position:absolute;top:3px;left:3px;width:9px;height:9px;border-radius:50%;background:var(--paper);transition:.18s;pointer-events:none;box-shadow:0 1px 2px rgba(0,0,0,.14)}
+        .tog input:checked~.tog-th{transform:translateX(15px)}
+
+        /* ── DROPZONE ── */
+        .dropzone{border:1px dashed var(--hairline);border-radius:4px;background:var(--paper2);padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s var(--ease);margin-bottom:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+        .dropzone.hover{border-color:var(--accent);background:var(--accent-bg)}
+        .dropzone-ico{font-size:32px;color:var(--muted);transition:color .2s}
+        .dropzone.hover .dropzone-ico{color:var(--accent-txt)}
+        .dropzone-lbl{font-size:13px;color:var(--ink-soft);line-height:1.5}
+        .dropzone-lbl span{color:var(--ink);font-weight:500;text-decoration:underline}
+        .dropzone-types{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+        .pdf-meta-box{display:flex;align-items:center;justify-content:space-between;background:var(--paper);border:1px solid var(--hairline);border-radius:3px;padding:10px 14px;margin-bottom:22px;animation:fadeup .22s var(--ease)}
+        .pdf-meta-info{display:flex;flex-direction:column;gap:2px}
+        .pdf-meta-name{font-size:12.5px;font-weight:500;color:var(--ink)}
+        .pdf-meta-size{font-family:var(--mono);font-size:9px;letter-spacing:.05em;color:var(--muted)}
+        .pdf-meta-remove{font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--hairline);border-radius:3px;padding:4px 10px;cursor:pointer;font-family:var(--sans);transition:all .12s}
+        .pdf-meta-remove:hover{background:var(--warn-bg);border-color:var(--warn);color:var(--warn-txt)}
+        .pdf-note{display:none;background:var(--accent-bg);border:1px solid var(--accent);border-radius:3px;padding:8px 12px;font-family:var(--mono);font-size:9px;letter-spacing:.02em;color:var(--accent-txt);margin-bottom:22px;animation:fadeup .22s var(--ease)}
+        .file-type-badge{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-left:6px;background:var(--accent-bg);color:var(--accent-txt);border:1px solid var(--accent)}
+
+        /* ── FLOATING CTA ── */
+        .floating-cta{position:fixed;bottom:28px;right:28px;z-index:800}
+        .run-btn{padding:11px 22px;border:1px solid var(--ink);border-radius:4px;background:var(--ink);color:var(--paper);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .18s var(--ease);box-shadow:0 4px 20px rgba(26,26,25,.2)}
+        .run-btn:hover:not(:disabled){background:#2A2A28;transform:translateY(-2px);box-shadow:0 8px 28px rgba(26,26,25,.18)}
+        .run-btn:disabled{background:var(--paper2);border-color:var(--hairline);color:var(--muted);cursor:not-allowed;box-shadow:none;transform:none}
+        [data-theme="dark"] .run-btn{box-shadow:0 4px 20px rgba(0,0,0,.4)}
+        .spin{width:13px;height:13px;border:1.5px solid rgba(251,251,250,.3);border-top-color:var(--paper);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+
+        /* ── RESULTS ── */
+        .results-section{background:var(--paper2);padding:48px 0;border-top:1px solid var(--hairline);display:none}
+        .jump-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 16px;background:var(--paper);border:1px solid var(--hairline);border-radius:6px;margin-bottom:28px}
+        .jump-pre{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+        .jump-link{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:3px;background:var(--paper2);color:var(--accent-txt);cursor:pointer;transition:all .12s;border:1px solid transparent}
+        .jump-link:hover{background:var(--accent-bg);border-color:var(--accent)}
+        .rcard{background:var(--paper);border:1px solid var(--hairline);border-radius:6px;padding:26px;margin-bottom:20px;scroll-margin-top:80px;animation:fadeup .22s ease both}
+        .rcard-lbl{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+        .rcard-lbl::after{content:'';flex:1;height:1px;background:var(--hairline)}
+
+        /* Donut Ring Chart */
+        .donut-chart-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+        .sc-ring {
+            width: 120px;
+            height: 120px;
+        }
+        .ring-bg {
+            stroke: var(--hairline);
+        }
+        .ring-fg {
+            stroke: var(--accent);
+            transition: stroke-dashoffset 1s var(--ease), stroke 0.3s;
+        }
+        .sc-ring.hi .ring-fg { stroke: var(--accent); }
+        .sc-ring.mid .ring-fg { stroke: var(--amber-txt); }
+        .sc-ring.lo .ring-fg { stroke: var(--warn); }
+        .donut-chart-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .donut-score {
+            font-family: var(--serif);
+            font-size: 38px;
+            font-weight: 500;
+            color: var(--ink);
+        }
+        .donut-verdict {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Sub-scores */
+        .sub-scores-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .sub-sc-card {
+            background: var(--paper);
+            border: 1px solid var(--hairline);
+            border-radius: 4px;
+            padding: 12px 14px;
+        }
+        .sub-sc-hdr {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .sub-sc-title {
+            font-family: var(--mono);
+            font-size: 8.5px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+        .sub-sc-val {
+            font-family: var(--sans);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+        .sub-sc-bar {
+            height: 3px;
+            background: var(--hairline2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .sub-sc-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.6s var(--ease);
+        }
+        .sub-sc-note {
+            font-size: 11.5px;
+            color: var(--ink-soft);
+            line-height: 1.4;
+        }
+
+        /* Chips */
+        .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+        .chip{padding:3px 9px;border-radius:999px;font-family:var(--mono);font-size:10px;letter-spacing:.04em;border:1px solid}
+        .chip-miss{background:var(--warn-bg);border-color:var(--warn);color:var(--warn-txt)}
+        .chip-hit{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-txt)}
+        .chip-neu{background:var(--paper2);border-color:var(--hairline);color:var(--muted)}
+        .chip-sug {
+            background: var(--blue-bg);
+            border-color: var(--blue-border);
+            color: var(--blue-txt);
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .chip-sug:hover {
+            filter: brightness(0.95);
+        }
+        .chip-section{margin-bottom:16px}
+        .chip-section-lbl{font-size:12px;color:var(--ink-soft);margin-bottom:6px;font-weight:500}
+        .atext{font-size:13px;line-height:1.75;color:var(--ink-soft)}
+        .atext ul{padding-left:18px;margin-top:6px}
+        .atext li{margin-bottom:4px}
+        .atext strong{color:var(--ink)}
+
+        /* Improvements panel */
+        .impr-badge {
+            font-family: var(--mono);
+            font-size: 8.5px;
+            letter-spacing: .08em;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .impr-badge.high { background: var(--warn-bg); color: var(--warn-txt); border: 1px solid var(--warn); }
+        .impr-badge.med { background: var(--amber-bg); color: var(--amber-txt); border: 1px solid #c8a000; }
+        .impr-badge.low { background: var(--paper3); color: var(--muted); border: 1px solid var(--hairline); }
+
+        /* Output tabs (LaTeX + Preview) */
+        .out-tabs{display:flex;border:1px solid var(--hairline);border-radius:3px;overflow:hidden;margin-bottom:14px}
+        .otab{flex:1;padding:7px 6px;font-size:11px;font-weight:500;cursor:pointer;background:transparent;border:none;color:var(--muted);border-right:1px solid var(--hairline);font-family:var(--sans);transition:all .12s;text-align:center}
+        .otab:last-child{border-right:none}
+        .otab.on{background:var(--ink);color:var(--paper)}
+        .otab:hover:not(.on){background:var(--paper2);color:var(--ink)}
+        .out-pane{display:none}
+        .out-pane.show{display:block}
+
+        /* Code */
+        .code-meta{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--muted);margin-bottom:8px}
+        .code-meta span{color:var(--ink)}
+        .code-box{background:var(--paper2);border:1px solid var(--hairline);border-radius:3px;padding:14px;font-family:var(--mono);font-size:10px;line-height:1.7;color:var(--ink-soft);overflow-x:auto;white-space:pre-wrap;max-height:460px;overflow-y:auto;margin:10px 0}
+        .code-box::-webkit-scrollbar{width:3px;height:3px}
+        .code-box::-webkit-scrollbar-thumb{background:var(--hairline)}
+        .cpbtn{width:100%;padding:9px;border:1px solid var(--hairline);border-radius:3px;background:var(--paper2);color:var(--muted);font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:all .12s;margin-top:8px}
+        .cpbtn:hover{border-color:var(--ink-soft);color:var(--ink)}
+        .cpbtn.ok{background:var(--accent-bg);border-color:var(--accent);color:var(--accent-txt)}
+
+        /* Diff */
+        .diff-box{background:var(--paper2);border:1px solid var(--hairline);border-radius:3px;padding:12px;max-height:400px;overflow-y:auto}
+        .dl-added { background: var(--accent-bg); color: var(--accent-txt); padding: 1px 6px; font-family: var(--mono); font-size: 10px; line-height: 1.7; }
+        .dl-removed { background: var(--warn-bg); color: var(--warn-txt); padding: 1px 6px; font-family: var(--mono); font-size: 10px; line-height: 1.7; }
+        .dl-unchanged { color: var(--ink-soft); padding: 1px 6px; opacity: 0.8; font-family: var(--mono); font-size: 10px; line-height: 1.7; }
+
+        /* Missing Section Warning UI */
+        .miss-chip-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .miss-chip {
+            background: var(--warn-bg);
+            border: 1px solid var(--warn);
+            border-radius: 6px;
+            padding: 12px 16px;
+            animation: fadeup 0.22s var(--ease) both;
+        }
+        .miss-label {
+            font-size: 13px;
+            color: var(--warn-txt);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .miss-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .miss-btn {
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: var(--sans);
+            transition: all 0.12s;
+        }
+        .miss-btn.ai-fill-btn {
+            background: var(--warn-txt);
+            color: var(--paper);
+            border: 1px solid var(--warn-txt);
+        }
+        .miss-btn.ai-fill-btn:hover {
+            opacity: 0.9;
+        }
+        .miss-btn.scroll-btn {
+            background: transparent;
+            color: var(--warn-txt);
+            border: 1px solid var(--warn-txt);
+        }
+        .miss-btn.scroll-btn:hover {
+            background: rgba(159, 47, 45, 0.05);
+        }
+        .miss-btn.skip-btn {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--hairline);
+        }
+        .miss-btn.skip-btn:hover {
+            border-color: var(--muted);
+            color: var(--ink);
+        }
+
+        /* Toast notifications */
+        .toast {
+            animation: fadeup 0.15s var(--ease);
+        }
+        @keyframes fadeout {
+            from { opacity: 1; transform: translate(-50%, 0); }
+            to { opacity: 0; transform: translate(-50%, 10px); }
+        }
+
+        /* Cover Box */
+        .cover-box{font-size:14px;line-height:1.85;color:var(--ink);background:var(--paper);border:1px solid var(--hairline);border-radius:3px;padding:20px 24px;white-space:pre-wrap;font-family:var(--serif);margin:10px 0}
+
+        /* PDF preview page */
+        .pdf-page{background:#fff;border:1px solid #E5E3DE;border-radius:3px;padding:34px 40px;font-family:'Georgia',serif;font-size:9.5px;color:#1A1A19;line-height:1.45;max-width:560px;box-shadow:0 2px 14px rgba(0,0,0,.07);margin: 0 auto;}
+        .pdf-name{font-size:17px;font-weight:700;text-align:center;letter-spacing:-.3px;margin-bottom:3px}
+        .pdf-contact{font-size:8px;text-align:center;color:#555;font-family:'Arial',sans-serif;margin-bottom:13px;letter-spacing:.02em}
+        .pdf-sec{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #1A1A19;padding-bottom:2px;margin:11px 0 6px}
+        .pdf-entry{margin-bottom:7px}
+        .pdf-hd{display:flex;justify-content:space-between;font-weight:700;font-size:9px}
+        .pdf-sub{display:flex;justify-content:space-between;font-style:italic;font-size:8.5px;color:#444;margin-bottom:3px}
+        .pdf-ul{padding-left:12px;margin:0}
+        .pdf-ul li{margin-bottom:1.5px;font-size:8.5px}
+
+        /* Checklist */
+        .chk-list{border:1px solid var(--hairline);border-radius:4px;overflow:hidden;margin:12px 0}
+        .ci{display:grid;grid-template-columns:4ch 1fr;gap:10px;align-items:baseline;padding:11px 14px;border-bottom:1px solid var(--hairline);font-size:12.5px}
+        .ci:last-child{border-bottom:none}
+        .ci.pass{background:var(--accent-bg)}
+        .ci.fail{background:var(--warn-bg)}
+        .ci-ico{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+        .ci.pass .ci-ico,.ci.pass .ci-txt{color:var(--accent-txt)}
+        .ci.fail .ci-ico,.ci.fail .ci-txt{color:var(--warn-txt)}
+        .verdict{padding:14px 18px;border-radius:3px;margin-top:6px;font-family:var(--serif);font-size:16px;line-height:1.55;font-style:italic}
+        .verdict.ok{background:var(--accent-bg);border:1px solid var(--accent);color:var(--accent-txt)}
+        .verdict.wait{background:var(--amber-bg);border:1px solid #c8a000;color:var(--amber-txt)}
+
+        /* Loading */
+        .loading-state{padding:48px 20px;text-align:center}
+        .ls-pre{font-family:var(--mono);font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:22px}
+        .ls-steps{list-style:none;padding:0;border-top:1px solid var(--hairline);max-width:280px;margin:0 auto}
+        .ls-step{display:grid;grid-template-columns:4ch 1fr;gap:12px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--hairline);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);transition:color .2s;text-align:left}
+        .ls-step-n{color:var(--hairline)}
+        .ls-step.on{color:var(--ink)}.ls-step.on .ls-step-n{color:var(--accent)}
+        .ls-step.done{color:var(--accent-txt)}.ls-step.done .ls-step-n{color:var(--accent)}
+
+        /* Error banner */
+        .err-banner{background:var(--warn-bg);border:1px solid var(--warn);border-radius:4px;padding:14px 16px;font-size:13px;color:var(--warn-txt);margin-bottom:20px;line-height:1.55;display:none}
+        .err-banner strong{font-weight:600}
+
+        /* FAQ */
+        .faq-item{border-bottom:1px solid var(--hairline);padding:18px 0}
+        .faq-item:last-child{border-bottom:none}
+        .faq-q{font-family:var(--serif);font-size:16px;color:var(--ink);cursor:pointer;user-select:none;font-weight:400;display:flex;align-items:baseline;gap:10px}
+        .faq-arrow{color:var(--accent);font-size:11px;transition:transform .2s;flex-shrink:0}
+        .faq-q.open .faq-arrow{transform:rotate(90deg)}
+        .faq-a{font-size:13px;color:var(--ink-soft);line-height:1.7;display:none;margin-top:10px;padding-left:20px}
+        .faq-a.show{display:block}
+        .faq-a a{color:var(--accent-txt);text-decoration:none}
+        .faq-a a:hover{text-decoration:underline}
+
+        /* Footer */
+        footer{border-top:1px solid var(--hairline);padding:36px 32px;text-align:center;color:var(--muted);font-size:12px}
+        footer a{color:var(--accent-txt);text-decoration:none}
+        footer a:hover{text-decoration:underline}
+
+        /* Custom Flow Style Upgrades */
+        .source-toggle {
+            display: flex;
+            border: 1px solid var(--hairline);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+        .stab {
+            padding: 6px 16px;
+            font-size: 11.5px;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            border-right: 1px solid var(--hairline);
+            font-family: var(--sans);
+            transition: all .12s;
+        }
+        .stab:last-child { border-right: none; }
+        .stab.on { background: var(--ink); color: var(--paper); }
+        .stab:hover:not(.on) { background: var(--paper2); color: var(--ink); }
+
+        .parse-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--accent-bg);
+            border: 1px solid var(--accent);
+            border-radius: 3px;
+            padding: 10px 14px;
+            font-size: 12.5px;
+            color: var(--accent-txt);
+            margin-bottom: 20px;
+            animation: fadeup .22s var(--ease);
+        }
+        .parse-banner.hidden { display: none; }
+        .parse-view-btn {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border: 1px solid var(--accent);
+            border-radius: 3px;
+            background: transparent;
+            color: var(--accent-txt);
+            cursor: pointer;
+            transition: all .12s;
+        }
+        .parse-view-btn:hover {
+            background: var(--accent);
+            color: var(--paper);
+        }
+
+        .mode-pill {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border: 1px solid var(--hairline);
+            border-radius: 999px;
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            background: var(--paper2);
+            transition: all .2s;
+        }
+        .mode-pill-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        @media(max-width:768px){
+            nav{padding:10px 16px}
+            .brand-tag,.brand-sep{display:none}
+            .hero{padding:48px 16px}
+            .container{padding:0 16px}
+            .cards{grid-template-columns:1fr}
+            .tips-list{grid-template-columns:1fr}
+            .input-section .container,.results-section .container{padding:0 16px}
+            .floating-cta{bottom:16px;right:16px}
+            .sub-scores-grid{grid-template-columns:1fr}
+            .modal{padding:24px}
+            nav .nav-mid{display:none}
+            #mobile-mode{display:none !important}
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── SETTINGS MODAL ── -->
+    <div class="modal-overlay hidden" id="settings-modal">
+        <div class="modal">
+            <div class="modal-head">API Settings</div>
+            <div class="modal-sub">Choose your AI provider and paste your API key. Stored locally in your browser only — never sent to any server.</div>
+
+            <span class="modal-label">Provider</span>
+            <div class="provider-tabs">
+                <button class="ptab on" data-p="gemini" onclick="selectProvider('gemini',this)">Gemini API</button>
+                <button class="ptab" data-p="openrouter" onclick="selectProvider('openrouter',this)">OpenRouter</button>
+            </div>
+
+            <div id="model-select-group" style="display:none">
+                <span class="modal-label">Model</span>
+                <select class="modal-input" id="api-model-select" style="font-family:var(--sans); font-size:12px;">
+                    <option value="google/gemini-2.5-flash" selected>google/gemini-2.5-flash (recommended default)</option>
+                    <option value="google/gemini-2.5-pro">google/gemini-2.5-pro (highest quality, slower)</option>
+                    <option value="anthropic/claude-3-5-haiku">anthropic/claude-3-5-haiku (fast, reliable)</option>
+                    <option value="meta-llama/llama-3.3-70b-instruct">meta-llama/llama-3.3-70b-instruct (free tier available)</option>
+                    <option value="mistralai/mistral-nemo">mistralai/mistral-nemo (lightweight fallback)</option>
+                </select>
+            </div>
+
+            <span class="modal-label" id="key-label">Google AI Studio Key</span>
+            <input class="modal-input" type="password" id="api-key-input" placeholder="AIzaSy…">
+            <div class="modal-hint" id="key-hint">
+                Get your key at <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>. Very generous free tier.
+            </div>
+
+            <div class="modal-warn" id="modal-warn">Please enter a valid API key before saving.</div>
+
+            <div class="modal-actions">
+                <button class="modal-save" onclick="saveSettings()">Save &amp; Continue</button>
+                <button class="modal-cancel" id="modal-cancel" onclick="closeModal()" style="display:none">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── NAV ── -->
+    <nav>
+        <a class="brand" href="#top">
+            <span class="brand-name">Resume <em>Engineer</em></span>
+            <span class="brand-sep"></span>
+            <span class="brand-tag">ATS-Optimised</span>
+        </a>
+        <div class="nav-mid">
+            <button class="ntab on" id="mbS" onclick="setMode('source')">Source</button>
+            <button class="ntab" id="mbL" onclick="setMode('latex')">LaTeX</button>
+            <button class="ntab" id="mbB" onclick="setMode('build')">Build</button>
+        </div>
+        <div class="nav-r">
+            <div class="mode-pill" id="mode-pill">
+                <span class="mode-pill-dot"></span>
+                <span class="mode-pill-lbl" id="mode-pill-lbl">Source</span>
+            </div>
+            <button class="nav-btn" onclick="openModal()">
+                <span class="provider-dot" id="nav-dot"></span>
+                <span id="nav-provider-lbl">Set API Key</span>
+            </button>
+            <button class="nav-btn" onclick="toggleTheme()">
+                <span id="theme-ico">☀</span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="prog-rail">
+        <div class="prog-fill" id="prog"></div>
+    </div>
+
+    <main id="top">
+
+        <!-- ── HERO ── -->
+        <div class="hero">
+            <div class="hero-pre">AI-Powered · ATS-Optimised · Free to Use</div>
+            <h1 class="hero-head">Tailor your resume to<br><em>every job description</em></h1>
+            <p class="hero-sub">Paste your LaTeX resume, build from scratch, or upload a PDF/TXT/MD. AI generates tailored LaTeX, ATS report, cover letter, and preview — in seconds.</p>
+            <div class="hero-badges">
+                <span class="badge">Jake Classic · ATS 5/5</span>
+                <span class="badge">Gemini · GPT-4o</span>
+                <span class="badge">PDF · TXT · MD · LaTeX</span>
+                <span class="badge">No data stored</span>
+            </div>
+        </div>
+
+        <!-- ── HOW IT WORKS ── -->
+        <div class="container">
+            <div class="section">
+                <div class="sec-pre">Process</div>
+                <h2 class="sec-head">Three steps to a perfectly tailored resume</h2>
+                <div class="cards">
+                    <div class="card">
+                        <div class="card-num">01</div>
+                        <h3 class="card-head">Prepare your resume</h3>
+                        <p class="card-body">Paste your existing LaTeX code, use the Build mode to fill in your details from scratch, or upload your existing PDF/TXT resume.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-num">02</div>
+                        <h3 class="card-head">Add the job description</h3>
+                        <p class="card-body">Paste the full job posting. The AI extracts required keywords, seniority signals, and tech stack expectations automatically.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-num">03</div>
+                        <h3 class="card-head">Generate &amp; apply</h3>
+                        <p class="card-body">Get tailored LaTeX code, ATS keyword report, diff of changes, cover letter, PDF preview, and a pre-apply checklist.</p>
+                    </div>
+                </div>
+                <div class="tips">
+                    <div class="tips-head">Tips for the best results</div>
+                    <ul class="tips-list">
+                        <li>Use action verbs: "Led", "Built", "Optimised"</li>
+                        <li>Quantify everything: "40% faster" beats "improved speed"</li>
+                        <li>Copy JD keywords directly into your bullets</li>
+                        <li>Keep to one page — ATS often ignores page 2+</li>
+                        <li>No tables, graphics, or fancy fonts</li>
+                        <li>Paste the full JD, not just a summary</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── INPUT SECTION ── -->
+        <div class="input-section">
+            <div class="container">
+                <h2 class="sec-head" style="margin-bottom:28px">Tailor your resume</h2>
+
+                <!-- SOURCE MODE -->
+                <div id="mode-source" style="display:none">
+                    <!-- Sub-mode toggle -->
+                    <div class="source-toggle">
+                        <button class="stab on" id="stab-upload" onclick="setSourceMode('upload')">📁 Upload File</button>
+                        <button class="stab" id="stab-paste" onclick="setSourceMode('paste')">📋 Paste Text</button>
+                    </div>
+
+                    <!-- Upload sub-mode (default visible) -->
+                    <div id="source-upload-pane">
+                        <div class="form-group">
+                            <label class="form-lbl">Upload Resume</label>
+                            <div class="dropzone" id="pdf-dropzone" onclick="document.getElementById('file-input').click()">
+                                <div class="dropzone-ico">📄</div>
+                                <div class="dropzone-lbl">Drag &amp; drop your resume here, or <span>browse</span></div>
+                                <div class="dropzone-types">PDF · TXT · MD supported · Max 10MB</div>
+                                <input type="file" id="file-input" accept=".pdf,.txt,.md,text/plain,text/markdown,application/pdf" style="display:none" onchange="onFileSelect(event)">
+                            </div>
+                            <div class="modal-warn" id="pdf-err" style="margin-top:0;margin-bottom:22px;display:none"></div>
+                            <div class="pdf-meta-box" id="pdf-preview-box" style="display:none">
+                                <div class="pdf-meta-info">
+                                    <span class="pdf-meta-name" id="pdf-meta-name">resume.pdf</span>
+                                    <span class="pdf-meta-size" id="pdf-meta-size">145 KB</span>
+                                </div>
+                                <button class="pdf-meta-remove" onclick="removeFile()">✕ Remove</button>
+                            </div>
+                            <div class="pdf-note" id="pdf-note">Text extracted from PDF client-side via PDF.js</div>
+                        </div>
+                    </div>
+
+                    <!-- Paste sub-mode (default hidden) -->
+                    <div id="source-paste-pane" style="display:none">
+                        <div class="form-group">
+                            <label class="form-lbl">Paste Resume Text</label>
+                            <textarea id="source-paste-input" rows="14" placeholder="Paste your resume content here — plain text, copied from a PDF, from LinkedIn, from Word, or any format. The AI will parse and structure it automatically."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Parsed banner (hidden until parse succeeds) -->
+                    <div class="parse-banner hidden" id="source-parse-banner">
+                        <span>✓ Resume content loaded</span>
+                        <button onclick="setMode('build')" class="parse-view-btn">View in Build →</button>
+                    </div>
+
+                    <!-- JD, fallback fields, template, options -->
+                    <div class="form-group">
+                        <label class="form-lbl">Job Description</label>
+                        <textarea id="jd-source" rows="8" placeholder="Paste the full job posting here…"></textarea>
+                        <div class="jd-fallback-fields" id="fallback-source" style="display:none;">
+                            <div class="fg" style="margin-bottom: 8px;">
+                                <div class="ff"><label>Target Role (Optional)</label><input type="text" id="role-source" placeholder="e.g. Software Engineer"></div>
+                                <div class="ff"><label>Industry/Domain (Optional)</label><input type="text" id="ind-source" placeholder="e.g. FinTech, Healthcare"></div>
+                            </div>
+                            <div id="tooltip-source" style="font-size:11px; color:var(--muted); display:none; padding-top:4px;">
+                                ℹ️ AI will infer role and keywords from your resume content.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-lbl">Template</label>
+                        <div class="tpl-list" id="tl-source"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-lbl">Options</label>
+                        <div class="tog-row"><span class="tog-lbl">Generate cover letter</span><label class="tog"><input type="checkbox" id="tc-source" checked><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+                        <div class="tog-row"><span class="tog-lbl">ATS keyword analysis</span><label class="tog"><input type="checkbox" id="ta-source" checked><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+                    </div>
+                </div>
+
+                <!-- LATEX MODE -->
+                <div id="mode-latex" style="display:none">
+                    <div class="form-group">
+                        <label class="form-lbl">Base LaTeX Resume</label>
+                        <textarea id="latex-input" rows="11" placeholder="Paste your full LaTeX resume source here…"></textarea>
+                        <p style="font-size:11px; color:var(--muted); margin-top:6px;">
+                            Your LaTeX will be sent directly to the AI for tailoring.
+                            No client-side parsing — the AI handles it end-to-end.
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-lbl">Job Description</label>
+                        <textarea id="jd-latex" rows="8" placeholder="Paste the full job posting here — including requirements, responsibilities, and preferred qualifications…"></textarea>
+                        <!-- Fallback Fields -->
+                        <div class="jd-fallback-fields" id="fallback-latex" style="display:none;">
+                            <div class="fg" style="margin-bottom: 8px;">
+                                <div class="ff"><label>Target Role (Optional)</label><input type="text" id="role-latex" placeholder="e.g. Software Engineer"></div>
+                                <div class="ff"><label>Industry/Domain (Optional)</label><input type="text" id="ind-latex" placeholder="e.g. FinTech, Healthcare"></div>
+                            </div>
+                            <div class="info-tooltip" id="tooltip-latex" style="font-size: 11px; color: var(--muted); display:none; padding-top: 4px;">
+                                ℹ️ Job description, target role, and industry are empty. AI will infer the target role and keywords from your resume content.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-lbl">Template</label>
+                        <div class="tpl-list" id="tl-latex"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-lbl">Options</label>
+                        <div class="tog-row"><span class="tog-lbl">Generate cover letter</span><label class="tog"><input type="checkbox" id="tc-latex" checked><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+                        <div class="tog-row"><span class="tog-lbl">Show diff vs base</span><label class="tog"><input type="checkbox" id="td-latex" checked><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+                        <div class="tog-row"><span class="tog-lbl">ATS keyword analysis</span><label class="tog"><input type="checkbox" id="ta-latex" checked><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+                    </div>
+                </div>
+
+                <!-- FORM / BUILD MODE -->
+                <div id="mode-build" style="display:none">
+                    <div class="acc">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <div class="acc-hd-l"><span class="acc-dot"></span><span class="acc-title">Personal Info</span></div>
+                            <span class="acc-chev open">▾</span>
+                        </div>
+                        <div class="acc-body show">
+                            <div class="fg">
+                                <div class="ff full"><label>Full Name</label><input type="text" id="f-name" placeholder="Your Full Name"></div>
+                                <div class="ff"><label>Phone</label><input type="text" id="f-phone" placeholder="+91-XXXXXXXXXX"></div>
+                                <div class="ff"><label>Email</label><input type="text" id="f-email" placeholder="you@gmail.com"></div>
+                                <div class="ff"><label>City, State</label><input type="text" id="f-loc" placeholder="Bhimavaram, AP"></div>
+                                <div class="ff"><label>LinkedIn</label><input type="text" id="f-linkedin" placeholder="linkedin.com/in/yourname"></div>
+                                <div class="ff"><label>GitHub</label><input type="text" id="f-github" placeholder="github.com/yourusername"></div>
+                                <div class="ff full"><label>Portfolio (optional)</label><input type="text" id="f-portfolio" placeholder="yourportfolio.com"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="acc">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <div class="acc-hd-l"><span class="acc-dot"></span><span class="acc-title">Objective</span></div>
+                            <span class="acc-chev open">▾</span>
+                        </div>
+                        <div class="acc-body show">
+                            <textarea id="f-obj" rows="2" placeholder="Final year B.Tech CSE student seeking SWE roles. Strong in Python, Java, full-stack with 3 deployed projects."></textarea>
+                            <span style="font-size:10.5px;color:var(--muted)">2–3 lines max. Tailor to every JD.</span>
+                        </div>
+                    </div>
+                    <div class="acc">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <div class="acc-hd-l"><span class="acc-dot"></span><span class="acc-title">Education</span></div>
+                            <div class="acc-hd-r"><button class="acc-add" onclick="event.stopPropagation();addEntry('edu')">+ Add</button><span class="acc-chev open">▾</span></div>
+                        </div>
+                        <div class="acc-body show" id="edu-list"></div>
+                    </div>
+                    <div class="acc">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <div class="acc-hd-l"><span class="acc-dot"></span><span class="acc-title">Technical Skills</span></div>
+                            <span class="acc-chev open">▾</span>
+                        </div>
+                        <div class="acc-body show">
+                            <div class="ff"><label>Languages</label><input type="text" id="f-langs" placeholder="Python, Java, C++, JavaScript"></div>
+                            <div class="ff"><label>Frameworks &amp; Libraries</label><input type="text" id="f-fw" placeholder="React, Flask, Node.js, Spring Boot"></div>
+                            <div class="ff"><label>Databases</label><input type="text" id="f-db" placeholder="MySQL, MongoDB, Firebase, PostgreSQL"></div>
+                            <div class="ff"><label>Tools &amp; Platforms</label><input type="text" id="f-tools" placeholder="Git, GitHub, Docker, VS Code, Linux"></div>
+                            <div class="ff"><label>ML / Data Science</label><input type="text" id="f-ml" placeholder="NumPy, Pandas, Scikit-learn, TensorFlow"></div>
+                            <div class="ff"><label>Cloud / DevOps</label><input type="text" id="f-cloud" placeholder="AWS, GCP, CI/CD basics"></div>
+                        </div>
+                    </div>
+                    <div class="acc">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <div class="acc-hd-l"><span class="acc-dot"></span><span class="acc-title">Projects</span></div>
+                            <div class="acc-hd-r"><button class="acc-add" onclick="event.stopPropagation();addEntry('proj')">+ Add</button><span class="acc-chev open">▾</span></div>
+                        </div>
+                        <div class="acc-body show" id="proj-list"></div>
+                    </div>
+                    <div class="acc">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <div class="acc-hd-l"><span class="acc-dot"></span><span class="acc-title">Internships / Experience</span></div>
+                            <div class="acc-hd-r"><button class="acc-add" onclick="event.stopPropagation();addEntry('exp')">+ Add</button><span class="acc-chev open">▾</span></div>
+                        </div>
+                        <div class="acc-body show" id="exp-list"></div>
+                    </div>
+                    <div class="acc">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <div class="acc-hd-l"><span class="acc-dot"></span><span class="acc-title">Certifications</span></div>
+                            <div class="acc-hd-r"><button class="acc-add" onclick="event.stopPropagation();addEntry('cert')">+ Add</button><span class="acc-chev open">▾</span></div>
+                        </div>
+                        <div class="acc-body show" id="cert-list"></div>
+                    </div>
+                    <div class="acc">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <div class="acc-hd-l"><span class="acc-dot"></span><span class="acc-title">Achievements &amp; Activities</span></div>
+                            <div class="acc-hd-r"><button class="acc-add" onclick="event.stopPropagation();addEntry('ach')">+ Add</button><span class="acc-chev open">▾</span></div>
+                        </div>
+                        <div class="acc-body show" id="ach-list"></div>
+                    </div>
+                    <div class="form-group" style="margin-top:14px">
+                        <label class="form-lbl">Job Description</label>
+                        <textarea id="jd-build" rows="8" placeholder="Paste the full job posting here…"></textarea>
+                        <!-- Fallback Fields -->
+                        <div class="jd-fallback-fields" id="fallback-build" style="display:none;">
+                            <div class="fg" style="margin-bottom: 8px;">
+                                <div class="ff"><label>Target Role (Optional)</label><input type="text" id="role-build" placeholder="e.g. Software Engineer"></div>
+                                <div class="ff"><label>Industry/Domain (Optional)</label><input type="text" id="ind-build" placeholder="e.g. FinTech, Healthcare"></div>
+                            </div>
+                            <div id="tooltip-build" style="font-size: 11px; color: var(--muted); display:none; padding-top: 4px;">
+                                ℹ️ AI will infer role and keywords from your resume content.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-lbl">Template</label>
+                        <div class="tpl-list" id="tl-build"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-lbl">Options</label>
+                        <div class="tog-row"><span class="tog-lbl">Generate cover letter</span><label class="tog"><input type="checkbox" id="tc-build" checked><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+                        <div class="tog-row"><span class="tog-lbl">ATS keyword analysis</span><label class="tog"><input type="checkbox" id="ta-build" checked><div class="tog-tr"></div><div class="tog-th"></div></label></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── RESULTS ── -->
+        <div class="results-section" id="results-section">
+            <div class="container">
+                <div class="err-banner" id="err-banner"></div>
+                <div id="out-body"></div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="container">
+            <div class="section">
+                <div class="sec-pre">FAQ</div>
+                <h2 class="sec-head">Frequently Asked Questions</h2>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-arrow">▸</span>How do I get a PDF from the LaTeX code?</div>
+                    <div class="faq-a">Copy the LaTeX code → go to <a href="https://www.overleaf.com" target="_blank">overleaf.com</a> → New Project → Blank → paste → click Compile → Download PDF. Takes under a minute.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-arrow">▸</span>How does the Upload mode work?</div>
+                    <div class="faq-a">All files (including PDFs) are extracted to plain text client-side using PDF.js before being sent to the selected AI provider. This keeps your data local and secure.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)"><span class="faq-arrow">▸</span>Is this only for freshers / CS students?</div>
+                    <div class="faq-a">No — it works for anyone. The section order and templates are optimised for fresher CS resumes by default, but the LaTeX mode works with any existing resume structure regardless of experience level or domain.</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>Resume Engineer · Powered by Google Gemini &amp; OpenRouter APIs · Your data never leaves your browser<br>
+            <a href="https://www.overleaf.com" target="_blank">Compile on Overleaf</a> ·
+            <a href="https://aistudio.google.com" target="_blank">Get Gemini Key</a> ·
+            <a href="https://openrouter.ai" target="_blank">Get OpenRouter Key</a>
+        </p>
+    </footer>
+
+    <div class="floating-cta">
+        <button class="run-btn" id="run-btn" onclick="generate()">
+            <span id="run-ico">⚡</span>
+            <span id="run-lbl">Generate</span>
+        </button>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:2000; pointer-events:none; display: flex; flex-direction: column-reverse; gap: 8px;"></div>
+
+    <script>
+        'use strict';
+
+        // ── STATE ──
+        var provider = 'gemini', apiKey = '', isDark = false, wC = true;
+        var mode = 'source', selTpl = 'jake-classic', R = {}, isGen = false, stepTmr = null;
+        var ec = { edu: 0, proj: 0, exp: 0, cert: 0, ach: 0 };
+        var openrouterModel = 'google/gemini-2.5-flash';
+
+        // ── FILE UPLOAD STATE ──
+        var fileBase64 = '', fileType = '', fileName = '', fileSizeKb = 0, fileText = '';
+
+        var PROVIDER_META = {
+            gemini: {
+                label: 'Gemini API', keyLabel: 'Google AI Studio Key', placeholder: 'AIzaSy…',
+                hint: 'Get your key at <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>. Very generous free tier.'
+            },
+            openrouter: {
+                label: 'OpenRouter', keyLabel: 'OpenRouter API Key', placeholder: 'sk-or-v1-…',
+                hint: 'Get your key at <a href="https://openrouter.ai" target="_blank">openrouter.ai</a>.'
+            }
+        };
+
+        var TPLS = [
+            { id: 'jake-classic', name: 'Jake Classic', desc: 'CS/SWE single-col, letterpaper, ATS gold standard', ats: '5/5', ab: 'ab5', def: true },
+            { id: 'datta-custom', name: 'Datta Custom', desc: 'A4, multi-col skills, India placements', ats: '5/5', ab: 'ab5' },
+            { id: 'tlc-datasci', name: 'TLC Data Sci', desc: 'ML / Data Science focused roles', ats: '4/5', ab: 'ab4' },
+            { id: 'harshibar', name: 'Harshibar Modern', desc: 'Sans-serif, icons, stylish', ats: '4/5', ab: 'ab4' },
+            { id: 'anubhav', name: 'Anubhav Detailed', desc: 'Campus placements, India-focused', ats: '3/5', ab: 'ab3' }
+        ];
+
+        var HINTS = {
+            'jake-classic': "Jake Ryan ATS template. \\documentclass[letterpaper,11pt]{article}. Packages: latexsym, fullpage, titlesec, marvosym, color, verbatim, enumitem, hyperref, fancyhdr, babel. \\pdfgentounicode=1. Single column. \\titlerule section headers. Commands: \\resumeItem{text}, \\resumeSubheading{Company}{Date}{Role}{Location}, \\resumeProjectHeading{\\textbf{Project} $|$ \\emph{Stack}}{Date}. Section order: Education, Technical Skills, Projects, Experience (if any), Certifications (if any), Extracurricular. No tables, no graphics, no color — pure ATS safe.",
+            'datta-custom': "\\documentclass[a4paper,11pt]{article}. \\usepackage[left=0.9cm,right=0.9cm,top=0.6cm,bottom=0.7cm]{geometry}. \\usepackage{enumitem,hyperref,titlesec,parskip,multicol}. \\pagenumbering{gobble}. Section order: Objective, Education, Technical Skills (multicols{2}), Projects, Experience, Certifications, Achievements. Header: centered {\\Large \\textbf{Name}}, contact line.",
+            'tlc-datasci': "TLC Data Science. a4paper 11pt. Sections: Objective, Technical Skills table (Languages|Libraries|Tools|Databases), Projects (ML-heavy first, include accuracy metrics and dataset sizes), Education, Certifications, Activities.",
+            'harshibar': "Harshibar modern: sfdefault font, fontawesome5 icons in header. Single column. Sections: Experience, Projects, Education, Skills.",
+            'anubhav': "Anubhav campus a4. Bold name header. Sections: Education (CGPA table), Skills Summary, Projects, Internships, Certifications, Positions of Responsibility, Achievements."
+        };
+
+        var STEPS = ['Parsing job description', 'Extracting keywords', 'Analysing gaps', 'Tailoring bullets', 'Generating LaTeX', 'Composing cover letter', 'Running ATS simulation'];
+
+        // ── UTILS ──
+        function ex(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function gv(id) { var x = document.getElementById(id); return x ? x.value : ''; }
+        function tv(id) { var x = document.getElementById(id); return x ? x.checked : true; }
+        function scCls(n, mx) { return n >= mx * .8 ? 'hi' : n >= mx * .6 ? 'mid' : 'lo'; }
+
+        // Copy text to clipboard and show feedback on button
+        function cpTxt(text, btnId) {
+            navigator.clipboard.writeText(text || '').then(function () {
+                var b = document.getElementById(btnId); if (!b) return;
+                var orig = b.textContent;
+                b.textContent = 'Copied ✓'; b.classList.add('ok');
+                setTimeout(function () { b.textContent = orig; b.classList.remove('ok'); }, 2000);
+            }).catch(function () { alert('Copy failed — please select and copy manually.'); });
+        }
+
+        // Show a custom popup toast notification
+        function showToast(message) {
+            var toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            toast.style.cssText = 'background: var(--ink); color: var(--paper); font-family: var(--mono); font-size: 11px; padding: 8px 16px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 8px; transition: opacity 0.15s ease, transform 0.15s ease;';
+            var container = document.getElementById('toast-container');
+            container.appendChild(toast);
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                setTimeout(function() { toast.remove(); }, 150);
+            }, 1500);
+        }
+
+        // Copy chip text to clipboard and show toast
+        function copyChipText(text, el) {
+            navigator.clipboard.writeText(text).then(function() {
+                showToast('Copied ✓');
+            }).catch(function() {
+                alert('Copy failed');
+            });
+        }
+
+        // Open in Overleaf using the URL API
+        function openOverleaf() {
+            if (!R.latex) return;
+            var url = 'https://www.overleaf.com/docs?snip=' + encodeURIComponent(R.latex);
+            window.open(url, '_blank');
+        }
+
+        // ── THEME ──
+        function toggleTheme() {
+            isDark = !isDark;
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-ico').textContent = isDark ? '☾' : '☀';
+            try { localStorage.setItem('re-theme', isDark ? 'dark' : 'light'); } catch (e) { }
+        }
+        (function () {
+            try {
+                if (localStorage.getItem('re-theme') === 'dark') {
+                    isDark = true;
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.getElementById('theme-ico').textContent = '☾';
+                }
+            } catch (e) { }
+        })();
+
+        // ── SETTINGS MODAL ──
+        function selectProvider(p, btn) {
+            provider = p;
+            document.querySelectorAll('.ptab').forEach(function (t) { t.classList.remove('on'); });
+            btn.classList.add('on');
+            
+            var keyInput = document.getElementById('api-key-input');
+            var modelGroup = document.getElementById('model-select-group');
+            var keyLabel = document.getElementById('key-label');
+            var keyHint = document.getElementById('key-hint');
+            
+            if (p === 'gemini') {
+                modelGroup.style.display = 'none';
+                keyLabel.textContent = 'Google AI Studio Key';
+                keyInput.placeholder = 'AIzaSy…';
+                keyHint.innerHTML = 'Get your key at <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>. Very generous free tier.';
+                keyInput.value = localStorage.getItem('re-key-gemini') || '';
+            } else {
+                modelGroup.style.display = 'block';
+                keyLabel.textContent = 'OpenRouter API Key';
+                keyInput.placeholder = 'sk-or-v1-…';
+                keyHint.innerHTML = 'Get your key at <a href="https://openrouter.ai" target="_blank">openrouter.ai</a>.';
+                keyInput.value = localStorage.getItem('re-key-openrouter') || '';
+                document.getElementById('api-model-select').value = localStorage.getItem('re-model-openrouter') || 'google/gemini-2.5-flash';
+            }
+            document.getElementById('modal-warn').style.display = 'none';
+        }
+
+        function openModal() {
+            var overlay = document.getElementById('settings-modal');
+            overlay.classList.remove('hidden');
+            
+            var savedKey = (provider === 'gemini') ? localStorage.getItem('re-key-gemini') : localStorage.getItem('re-key-openrouter');
+            document.getElementById('modal-cancel').style.display = savedKey ? 'block' : 'none';
+            
+            var keyInput = document.getElementById('api-key-input');
+            keyInput.value = savedKey || '';
+            
+            document.querySelectorAll('.ptab').forEach(function (t) { 
+                t.classList.toggle('on', t.dataset.p === provider); 
+            });
+            
+            var modelGroup = document.getElementById('model-select-group');
+            var keyLabel = document.getElementById('key-label');
+            var keyHint = document.getElementById('key-hint');
+            
+            if (provider === 'gemini') {
+                modelGroup.style.display = 'none';
+                keyLabel.textContent = 'Google AI Studio Key';
+                keyInput.placeholder = 'AIzaSy…';
+                keyHint.innerHTML = 'Get your key at <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>. Very generous free tier.';
+            } else {
+                modelGroup.style.display = 'block';
+                keyLabel.textContent = 'OpenRouter API Key';
+                keyInput.placeholder = 'sk-or-v1-…';
+                keyHint.innerHTML = 'Get your key at <a href="https://openrouter.ai" target="_blank">openrouter.ai</a>.';
+                document.getElementById('api-model-select').value = localStorage.getItem('re-model-openrouter') || 'google/gemini-2.5-flash';
+            }
+        }
+
+        function closeModal() { document.getElementById('settings-modal').classList.add('hidden'); }
+
+        function saveSettings() {
+            var key = document.getElementById('api-key-input').value.trim();
+            if (!key) { document.getElementById('modal-warn').style.display = 'block'; return; }
+            
+            apiKey = key;
+            try {
+                localStorage.setItem('re-provider', provider);
+                if (provider === 'gemini') {
+                    localStorage.setItem('re-key-gemini', key);
+                } else {
+                    localStorage.setItem('re-key-openrouter', key);
+                    var modelVal = document.getElementById('api-model-select').value;
+                    localStorage.setItem('re-model-openrouter', modelVal);
+                    openrouterModel = modelVal;
+                }
+            } catch (e) { }
+            updateNavProvider();
+            closeModal();
+            updateFileNoteVisibility();
+        }
+
+        function updateNavProvider() {
+            var labels = { gemini: 'Gemini API', openrouter: 'OpenRouter' };
+            var labelStr = labels[provider] || 'Set API Key';
+            if (provider === 'openrouter') {
+                var modelVal = localStorage.getItem('re-model-openrouter') || openrouterModel;
+                var shortModel = modelVal.split('/').pop();
+                labelStr += ' (' + shortModel + ')';
+            }
+            document.getElementById('nav-provider-lbl').textContent = labelStr;
+            
+            var savedKey = (provider === 'gemini') ? localStorage.getItem('re-key-gemini') : localStorage.getItem('re-key-openrouter');
+            document.getElementById('nav-dot').style.background = savedKey ? 'var(--accent)' : 'var(--warn)';
+        }
+
+        // Load saved settings
+        (function () {
+            try {
+                var sp = localStorage.getItem('re-provider');
+                if (sp) provider = sp;
+                
+                var geminiKey = localStorage.getItem('re-key-gemini');
+                var orKey = localStorage.getItem('re-key-openrouter');
+                var orModel = localStorage.getItem('re-model-openrouter');
+                
+                // Fallback to older 're-key' if present
+                if (!geminiKey && !orKey) {
+                    var oldKey = localStorage.getItem('re-key');
+                    if (oldKey) {
+                        if (provider === 'gemini') {
+                            localStorage.setItem('re-key-gemini', oldKey);
+                            geminiKey = oldKey;
+                        } else {
+                            localStorage.setItem('re-key-openrouter', oldKey);
+                            orKey = oldKey;
+                        }
+                    }
+                }
+                
+                if (orModel) openrouterModel = orModel;
+                
+                // Set initial active key
+                apiKey = (provider === 'gemini') ? geminiKey : orKey;
+                
+                updateNavProvider();
+                
+                // Auto-open modal if no key is present for the current provider
+                if (!apiKey) {
+                    setTimeout(openModal, 400);
+                }
+            } catch (e) {
+                setTimeout(openModal, 400);
+            }
+        })();
+
+        // ── MODE ──
+        function setMode(m) {
+            // [v4] refactored navigation modes and updated view displays
+            mode = m;
+            document.querySelectorAll('.nav-mid').forEach(function (nav) {
+                var btnS = nav.querySelector('#mbS');
+                var btnL = nav.querySelector('#mbL');
+                var btnB = nav.querySelector('#mbB');
+                if (btnS) btnS.classList.toggle('on', m === 'source');
+                if (btnL) btnL.classList.toggle('on', m === 'latex');
+                if (btnB) btnB.classList.toggle('on', m === 'build');
+            });
+            document.getElementById('mode-source').style.display = m === 'source' ? 'block' : 'none';
+            document.getElementById('mode-latex').style.display = m === 'latex' ? 'block' : 'none';
+            document.getElementById('mode-build').style.display = m === 'build' ? 'block' : 'none';
+            updateFileNoteVisibility();
+            updateJDFallbacks();
+            updateModePill(m);
+            var el = document.querySelector('.input-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ── SOURCE SUB-MODES ──
+        function setSourceMode(m) {
+            // [v4] toggle between upload and paste input panes in the source mode
+            var uploadPane = document.getElementById('source-upload-pane');
+            var pastePane = document.getElementById('source-paste-pane');
+            var tabUpload = document.getElementById('stab-upload');
+            var tabPaste = document.getElementById('stab-paste');
+
+            if (m === 'upload') {
+                uploadPane.style.display = 'block';
+                pastePane.style.display = 'none';
+                tabUpload.classList.add('on');
+                tabPaste.classList.remove('on');
+            } else {
+                uploadPane.style.display = 'none';
+                pastePane.style.display = 'block';
+                tabPaste.classList.add('on');
+                tabUpload.classList.remove('on');
+            }
+        }
+
+        // ── MODE PILL INDICATOR ──
+        function updateModePill(m) {
+            // [v4] update persistent mode indicator pill text
+            var labels = { source: 'Source', latex: 'LaTeX', build: 'Build' };
+            var pill = document.getElementById('mode-pill-lbl');
+            if (pill) pill.textContent = labels[m] || m;
+        }
+
+        // ── PARSE BANNER TRIGGER ──
+        function showSourceParseBanner() {
+            // [v4] show parse banner indicating source content has been loaded
+            var banner = document.getElementById('source-parse-banner');
+            if (banner) banner.classList.remove('hidden');
+        }
+
+        // Add paste textarea input listener
+        document.getElementById('source-paste-input').addEventListener('input', function() {
+            if (this.value.trim().length > 50) {
+                showSourceParseBanner();
+            }
+        });
+
+        // ── ACCORDION ──
+        function toggleAcc(hd) {
+            var body = hd.nextElementSibling;
+            var ch = hd.querySelector('.acc-chev');
+            var open = body.classList.contains('show');
+            body.classList.toggle('show', !open);
+            if (ch) ch.classList.toggle('open', !open);
+        }
+
+        // ── FAQ ──
+        function toggleFaq(q) {
+            var a = q.nextElementSibling;
+            q.classList.toggle('open');
+            a.classList.toggle('show');
+        }
+
+        // ── TEMPLATES ──
+        function initTpls() {
+            // [v4] update template rendering containers to match new tab IDs
+            ['tl-source', 'tl-latex', 'tl-build'].forEach(function (lid) {
+                var c = document.getElementById(lid); if (!c) return;
+                c.innerHTML = TPLS.map(function (t) {
+                    return '<div class="tpl-item' + (t.def ? ' sel' : '') + '" data-id="' + t.id + '" onclick="pickTpl(this,\'' + lid + '\')">' +
+                        '<div class="tpl-radio"></div>' +
+                        '<div class="tpl-meta"><div class="tpl-name">' + t.name + '</div><div class="tpl-desc">' + t.desc + '</div></div>' +
+                        '<span class="tpl-badge ' + t.ab + '">ATS ' + t.ats + '</span></div>';
+                }).join('');
+            });
+        }
+
+        function pickTpl(el, lid) {
+            document.querySelectorAll('#' + lid + ' .tpl-item').forEach(function (r) { r.classList.remove('sel'); });
+            el.classList.add('sel');
+            selTpl = el.dataset.id;
+        }
+
+        // ── FILE UPLOAD (PDF + TXT + MD) ──
+        function initDropzone() {
+            var dz = document.getElementById('pdf-dropzone'); if (!dz) return;
+            ['dragenter', 'dragover'].forEach(function (e) {
+                dz.addEventListener(e, function (ev) { ev.preventDefault(); ev.stopPropagation(); dz.classList.add('hover'); }, false);
+            });
+            ['dragleave', 'drop'].forEach(function (e) {
+                dz.addEventListener(e, function (ev) { ev.preventDefault(); ev.stopPropagation(); dz.classList.remove('hover'); }, false);
+            });
+            dz.addEventListener('drop', function (ev) {
+                var f = ev.dataTransfer.files; if (f && f.length) handleFile(f[0]);
+            }, false);
+        }
+
+        function onFileSelect(e) { var f = e.target.files; if (f && f.length) handleFile(f[0]); }
+
+        function handleFile(file) {
+            var err = document.getElementById('pdf-err');
+            err.style.display = 'none'; err.textContent = '';
+            var ext = file.name.split('.').pop().toLowerCase();
+            if (['pdf', 'txt', 'md'].indexOf(ext) === -1) {
+                err.textContent = 'Only PDF, TXT, or MD files are supported.'; err.style.display = 'block'; return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                err.textContent = 'File size exceeds 10 MB limit.'; err.style.display = 'block'; return;
+            }
+            fileName = file.name; fileSizeKb = Math.round(file.size / 1024); fileType = ext;
+            if (ext === 'pdf') {
+                var reader = new FileReader();
+                reader.onload = async function (e) {
+                    var result = e.target.result;
+                    fileBase64 = result.split(',')[1];
+                    fileText = '';
+                    showFileMeta();
+                    try { 
+                        fileText = await extractTextFromPdf(fileBase64); 
+                    } catch (ex) { 
+                        console.warn('PDF text extraction failed:', ex); 
+                        showFileErr('PDF text extraction failed. Sending empty text placeholder.');
+                    }
+                    updateFileNoteVisibility();
+                };
+                reader.onerror = function () { showFileErr('Error reading file.'); };
+                reader.readAsDataURL(file);
+            } else {
+                var tr = new FileReader();
+                tr.onload = function (e) {
+                    fileText = e.target.result;
+                    fileBase64 = '';
+                    showFileMeta();
+                    updateFileNoteVisibility();
+                };
+                tr.onerror = function () { showFileErr('Error reading file.'); };
+                tr.readAsText(file);
+            }
+        }
+
+        function showFileErr(msg) {
+            var err = document.getElementById('pdf-err'); err.textContent = msg; err.style.display = 'block';
+        }
+
+        function showFileMeta() {
+            document.getElementById('pdf-dropzone').style.display = 'none';
+            document.getElementById('pdf-meta-name').textContent = fileName;
+            document.getElementById('pdf-meta-size').textContent = fileSizeKb + ' KB · ' + fileType.toUpperCase();
+            document.getElementById('pdf-preview-box').style.display = 'flex';
+            showSourceParseBanner(); // [v4] show parse banner on file load
+        }
+
+        function removeFile() {
+            fileBase64 = ''; fileType = ''; fileName = ''; fileSizeKb = 0; fileText = '';
+            document.getElementById('file-input').value = '';
+            document.getElementById('pdf-dropzone').style.display = 'flex';
+            document.getElementById('pdf-preview-box').style.display = 'none';
+            document.getElementById('pdf-err').style.display = 'none';
+            updateFileNoteVisibility();
+            var banner = document.getElementById('source-parse-banner');
+            if (banner) banner.classList.add('hidden'); // [v4] hide parse banner
+        }
+
+        function updateFileNoteVisibility() {
+            var note = document.getElementById('pdf-note');
+            if (note) note.style.display = (fileBase64 && fileType === 'pdf') ? 'block' : 'none';
+        }
+
+        // ── PDF TEXT EXTRACTION via PDF.js ──
+        async function extractTextFromPdf(base64Data) {
+            var raw = window.atob(base64Data);
+            var array = new Uint8Array(raw.length);
+            for (var i = 0; i < raw.length; i++) array[i] = raw.charCodeAt(i);
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            var pdf = await pdfjsLib.getDocument({ data: array }).promise;
+            var text = '';
+            for (var p = 1; p <= pdf.numPages; p++) {
+                var page = await pdf.getPage(p);
+                var content = await page.getTextContent();
+                text += content.items.map(function (item) { return item.str; }).join(' ') + '\n';
+            }
+            return text;
+        }
+
+        // ── JD FALLBACK SYSTEM ──
+        function updateJDFallbacks() {
+            // [v4] refactored JD fallback fields visibility logic
+            ['latex', 'source', 'build'].forEach(function(m) {
+                var jdEl = document.getElementById('jd-' + m);
+                if (!jdEl) return;
+                var jdVal = jdEl.value.trim();
+                var fallbackDiv = document.getElementById('fallback-' + m);
+                var tooltipDiv = document.getElementById('tooltip-' + m);
+                
+                var roleEl = document.getElementById('role-' + m);
+                var indEl = document.getElementById('ind-' + m);
+                var roleVal = roleEl ? roleEl.value.trim() : '';
+                var indVal = indEl ? indEl.value.trim() : '';
+                
+                if (jdVal === '') {
+                    fallbackDiv.style.display = 'block';
+                    if (roleVal === '' && indVal === '') {
+                        tooltipDiv.style.display = 'block';
+                    } else {
+                        tooltipDiv.style.display = 'none';
+                    }
+                } else {
+                    fallbackDiv.style.display = 'none';
+                }
+            });
+        }
+
+        // Setup input event listeners for fallback visibility updates
+        // [v4] updated mode array to ['latex', 'source', 'build']
+        ['latex', 'source', 'build'].forEach(function(m) {
+            var jd = document.getElementById('jd-' + m);
+            var r = document.getElementById('role-' + m);
+            var i = document.getElementById('ind-' + m);
+            if (jd) jd.addEventListener('input', updateJDFallbacks);
+            if (r) r.addEventListener('input', updateJDFallbacks);
+            if (i) i.addEventListener('input', updateJDFallbacks);
+        });
+
+        // ── FORM BUILDER ──
+        function addEntry(type) {
+            var list = document.getElementById(type + '-list'); if (!list) return;
+            ec[type]++; var n = ec[type];
+            var uid = type + n + 'x' + Date.now();
+            var card = document.createElement('div'); card.className = 'ecard'; card.id = uid;
+            var rm = '<button class="ecard-rm" onclick="document.getElementById(\'' + uid + '\').remove()">✕</button>';
+            var hd = '<div class="ecard-hd"><span class="ecard-lbl">' + type + ' ' + n + '</span>' + rm + '</div>';
+            if (type === 'edu') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff full"><label>Institution</label><input type="text" placeholder="Vishnu Institute of Technology, Bhimavaram"></div>' +
+                    '<div class="ff full"><label>Degree &amp; Branch</label><input type="text" placeholder="B.Tech in CSE (AI &amp; DS)"></div>' +
+                    '<div class="ff"><label>Start</label><input type="text" placeholder="2023"></div>' +
+                    '<div class="ff"><label>End / Expected</label><input type="text" placeholder="2027 (Expected)"></div>' +
+                    '<div class="ff"><label>CGPA / %</label><input type="text" placeholder="8.33 / 10"></div>' +
+                    '<div class="ff"><label>Location</label><input type="text" placeholder="Bhimavaram, AP"></div>' +
+                    '<div class="ff full"><label>Relevant Coursework</label><input type="text" placeholder="DSA, DBMS, OS, ML, CN"></div></div>';
+            } else if (type === 'proj') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff"><label>Project Name</label><input type="text" placeholder="AgriVision"></div>' +
+                    '<div class="ff"><label>Tech Stack</label><input type="text" placeholder="Python, Flask, React"></div>' +
+                    '<div class="ff"><label>Duration</label><input type="text" placeholder="Jan 2024 – Mar 2024"></div>' +
+                    '<div class="ff"><label>GitHub / Demo</label><input type="text" placeholder="github.com/you/project"></div>' +
+                    '<div class="ff full"><label>Description</label><input type="text" placeholder="One-line description"></div>' +
+                    '<div class="ff full"><label>Key Bullets (one per line, use numbers)</label>' +
+                    '<textarea rows="4" placeholder="Trained model achieving 91% accuracy on 12k samples&#10;Built REST API serving 300+ daily requests&#10;Deployed on Render with 99.7% uptime"></textarea></div></div>';
+            } else if (type === 'exp') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff"><label>Company</label><input type="text" placeholder="SmartBridge"></div>' +
+                    '<div class="ff"><label>Role</label><input type="text" placeholder="Data Science Intern"></div>' +
+                    '<div class="ff"><label>Duration</label><input type="text" placeholder="May 2025 – Jul 2025"></div>' +
+                    '<div class="ff"><label>Mode</label><input type="text" placeholder="Remote"></div>' +
+                    '<div class="ff full"><label>Key Bullets (quantify impact)</label>' +
+                    '<textarea rows="4" placeholder="Analysed 50k-row dataset; surfaced 3 revenue trends&#10;Built Tableau dashboard adopted by 4 teams&#10;Automated pipeline saving 6 hours/week"></textarea></div></div>';
+            } else if (type === 'cert') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff full"><label>Certification &amp; Issuer</label><input type="text" placeholder="Programming in Java — NPTEL (IIT Kharagpur)"></div>' +
+                    '<div class="ff"><label>Platform</label><input type="text" placeholder="NPTEL / Coursera / Kaggle"></div>' +
+                    '<div class="ff"><label>Year</label><input type="text" placeholder="2024"></div></div>';
+            } else if (type === 'ach') {
+                card.innerHTML = hd + '<div class="fg">' +
+                    '<div class="ff full"><label>Achievement / Activity</label><input type="text" placeholder="Finalist — Smart India Hackathon 2024, VIT"></div>' +
+                    '<div class="ff full"><label>Details (optional)</label><input type="text" placeholder="Top 3 of 40 teams; built AgriVision"></div></div>';
+            }
+            list.appendChild(card);
+        }
+
+        function buildForm() {
+            var t = 'NAME: ' + gv('f-name') + '\nPHONE: ' + gv('f-phone') + ' | EMAIL: ' + gv('f-email') + ' | LOCATION: ' + gv('f-loc') + '\nLINKEDIN: ' + gv('f-linkedin') + ' | GITHUB: ' + gv('f-github');
+            var p = gv('f-portfolio'); if (p) t += ' | PORTFOLIO: ' + p;
+            t += '\n\nOBJECTIVE:\n' + gv('f-obj') + '\n\n';
+            document.querySelectorAll('#edu-list .ecard').forEach(function (x) {
+                var i = x.querySelectorAll('input');
+                t += 'EDU: ' + i[0].value + ' | ' + i[1].value + ' | ' + i[2].value + ' – ' + i[3].value + ' | CGPA: ' + i[4].value + ' | ' + i[5].value + '\nCoursework: ' + i[6].value + '\n\n';
+            });
+            t += 'SKILLS:\nLanguages: ' + gv('f-langs') + '\nFrameworks: ' + gv('f-fw') + '\nDatabases: ' + gv('f-db') + '\nTools: ' + gv('f-tools') + '\nML/Data: ' + gv('f-ml') + '\nCloud: ' + gv('f-cloud') + '\n\n';
+            document.querySelectorAll('#proj-list .ecard').forEach(function (x) {
+                var i = x.querySelectorAll('input'), ta = x.querySelector('textarea');
+                t += 'PROJECT: ' + i[0].value + ' | Stack: ' + i[1].value + ' | ' + i[2].value + ' | ' + i[3].value + '\nDesc: ' + i[4].value + '\n' + (ta ? ta.value : '') + '\n\n';
+            });
+            document.querySelectorAll('#exp-list .ecard').forEach(function (x) {
+                var i = x.querySelectorAll('input'), ta = x.querySelector('textarea');
+                t += 'EXPERIENCE: ' + i[0].value + ' | ' + i[1].value + ' | ' + i[2].value + ' | ' + i[3].value + '\n' + (ta ? ta.value : '') + '\n\n';
+            });
+            document.querySelectorAll('#cert-list .ecard').forEach(function (x) {
+                var i = x.querySelectorAll('input');
+                t += 'CERT: ' + i[0].value + ' | ' + i[1].value + ' | ' + i[2].value + '\n';
+            }); t += '\n';
+            document.querySelectorAll('#ach-list .ecard').forEach(function (x) {
+                var i = x.querySelectorAll('input');
+                t += 'ACHIEVEMENT: ' + i[0].value + ' — ' + i[1].value + '\n';
+            });
+            return t;
+        }
+
+        // ── API CALLS ──
+
+        // Call Google Gemini API (Google AI Studio)
+        async function callGemini(sys, usr) {
+            var activeKey = localStorage.getItem('re-key-gemini') || apiKey;
+            if (!activeKey) throw new Error('Gemini API key is not set. Open API Settings.');
+            
+            var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + activeKey;
+            
+            var requestBody = {
+                systemInstruction: {
+                    parts: [{ text: sys }]
+                },
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [{ text: usr }]
+                    }
+                ],
+                generationConfig: {
+                    maxOutputTokens: 8000,
+                    temperature: 0.3,
+                    responseMimeType: 'application/json'
+                }
+            };
+            
+            var resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+            });
+            
+            var data = await resp.json();
+            if (data.error) throw new Error(data.error.message || 'Gemini API error');
+            if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0].text) {
+                throw new Error('Malformed API response from Gemini');
+            }
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        // Call OpenRouter API
+        async function callOpenRouter(sys, usr) {
+            var activeKey = localStorage.getItem('re-key-openrouter') || apiKey;
+            if (!activeKey) throw new Error('OpenRouter API key is not set. Open API Settings.');
+            
+            var activeModel = localStorage.getItem('re-model-openrouter') || openrouterModel;
+            var url = 'https://openrouter.ai/api/v1/chat/completions';
+            
+            var requestBody = {
+                model: activeModel,
+                messages: [
+                    { role: 'system', content: sys },
+                    { role: 'user', content: usr }
+                ],
+                response_format: { type: 'json_object' }
+            };
+            
+            var resp = await fetch(url, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + activeKey
+                },
+                body: JSON.stringify(requestBody)
+            });
+            
+            var data = await resp.json();
+            if (data.error) throw new Error(data.error.message || 'OpenRouter API error');
+            if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+                throw new Error('Malformed API response from OpenRouter');
+            }
+            return data.choices[0].message.content;
+        }
+
+        async function callAI(sys, usr) {
+            if (provider === 'gemini') return callGemini(sys, usr);
+            if (provider === 'openrouter') return callOpenRouter(sys, usr);
+            throw new Error('No valid AI provider selected.');
+        }
+
+        // ── GENERATE ──
+        async function generate() {
+            // [v4] refactored generate inputs, validation, and options parsing logic
+            if (isGen) return;
+            
+            var savedKey = (provider === 'gemini') ? localStorage.getItem('re-key-gemini') : localStorage.getItem('re-key-openrouter');
+            if (!savedKey) { openModal(); return; }
+
+            var isS = mode === 'source';
+            var isL = mode === 'latex';
+            var isB = mode === 'build';
+
+            // Get JD based on active mode
+            var jd = (isL ? gv('jd-latex') : isS ? gv('jd-source') : gv('jd-build')).trim();
+
+            // Get resume content based on active mode
+            var resume = '';
+            if (isL) {
+                resume = gv('latex-input').trim();
+            } else if (isS) {
+                // Check which source sub-mode is active
+                var pastePane = document.getElementById('source-paste-pane');
+                if (pastePane && pastePane.style.display !== 'none') {
+                    // Paste mode
+                    resume = gv('source-paste-input').trim();
+                } else {
+                    // Upload mode
+                    resume = fileText.trim();
+                }
+            } else {
+                // Build mode
+                resume = buildForm().trim();
+            }
+
+            // Get active role/industry fallback fields
+            var activeRole = gv('role-' + mode).trim();
+            var activeInd = gv('ind-' + mode).trim();
+
+            // Validation
+            if (!jd && !activeRole && !activeInd) {
+                alert('Please provide at least a Job Description, a Target Role, or an Industry.');
+                return;
+            }
+            if (isS) {
+                var pastePane2 = document.getElementById('source-paste-pane');
+                var isPaste = pastePane2 && pastePane2.style.display !== 'none';
+                if (!isPaste && !fileText) {
+                    alert('Please upload a file first (PDF, TXT, or MD).');
+                    return;
+                }
+                if (isPaste && !resume) {
+                    alert('Please paste your resume text first.');
+                    return;
+                }
+            }
+            if (isL && !resume) {
+                alert('Please paste your LaTeX resume.');
+                return;
+            }
+            if (isB && !resume) {
+                alert('Please fill in at least your basic details.');
+                return;
+            }
+
+            // input_mode for the AI system prompt
+            var aiInputMode = isL ? 'latex' : isB ? 'form' : 'upload';
+
+            // Get toggles
+            wC = tv(isL ? 'tc-latex' : isS ? 'tc-source' : 'tc-build');
+            var wD = isL && tv('td-latex');
+
+            // Get selected template
+            var activeLid = isL ? 'tl-latex' : isS ? 'tl-source' : 'tl-build';
+            var activeTplEl = document.querySelector('#' + activeLid + ' .tpl-item.sel');
+            if (activeTplEl) selTpl = activeTplEl.dataset.id;
+            var hint = HINTS[selTpl] || HINTS['jake-classic'];
+
+            // System prompt configured precisely as in brain.md (Prompt 1)
+            var sys = `You are Resume Engineer, an expert ATS resume optimizer and career
+assistant. Your job is to analyze a user's resume and generate a
+fully optimized, compilable LaTeX resume tailored to the target role.
+
+You will always respond with a single valid JSON object. No markdown,
+no explanation outside the JSON, no preamble. Just raw JSON.
+
+---
+
+## INPUT YOU WILL RECEIVE
+
+The user message will contain:
+- resume_content: their raw resume (text, form data, or LaTeX)
+- input_mode: "latex" | "form" | "upload"
+- jd: job description text (may be empty string)
+- target_role: e.g. "Data Analyst Intern" (may be empty string)
+- industry: e.g. "FinTech" (may be empty string)
+- template_id: one of [jake-classic, datta-custom, tlc-datasci,
+  harshibar, anubhav]
+- generate_cover_letter: true | false
+
+---
+
+## JD FALLBACK LOGIC
+
+Follow this priority order strictly:
+1. If jd is non-empty → use it for keyword extraction and tailoring.
+2. If jd is empty but target_role and industry are provided → infer
+   ATS expectations for that role and industry. Simulate what
+   keywords Workday/Greenhouse ATS systems expect.
+3. If all three are empty → infer role, industry, and keywords
+   entirely from the resume content itself. State your inference
+   in the ats_report.role_inferred field.
+
+---
+
+## YOUR OUTPUT — JSON SCHEMA
+
+Return exactly this structure:
+
+{
+  "latex": "<full compilable LaTeX string>",
+
+  "html_preview": "<minimal HTML string for PDF-style preview>",
+
+  "ats_report": {
+    "overall_score": <integer 0-100>,
+    "verdict": "PASS" | "BORDERLINE" | "FAIL",
+    "pass_threshold": 70,
+    "role_inferred": "<string — state inferred role if JD was blank>",
+    "sub_scores": {
+      "keyword_density": {
+        "score": <integer 0-25>,
+        "max": 25,
+        "present_count": <integer>,
+        "missing_count": <integer>,
+        "note": "<one sentence explanation>"
+      },
+      "ats_formatting": {
+        "score": <integer 0-25>,
+        "max": 25,
+        "issues_found": ["<issue1>", "<issue2>"],
+        "note": "<one sentence explanation>"
+      },
+      "section_order": {
+        "score": <integer 0-25>,
+        "max": 25,
+        "detected_order": ["<section1>", "<section2>", "..."],
+        "optimal_order": ["<section1>", "<section2>", "..."],
+        "note": "<one sentence explanation>"
+      },
+      "readability_bullets": {
+        "score": <integer 0-25>,
+        "max": 25,
+        "action_verb_strength": <integer 0-10>,
+        "quantification_rate": "<e.g. 4/8 bullets have metrics>",
+        "note": "<one sentence explanation>"
+      }
+    },
+    "keywords": {
+      "present": ["<kw1>", "<kw2>"],
+      "missing": ["<kw1>", "<kw2>"],
+      "suggested": ["<kw1>", "<kw2>"]
+    },
+    "improvements": [
+      {
+        "priority": "HIGH" | "MEDIUM" | "LOW",
+        "suggestion": "<specific actionable fix, not generic advice>"
+      }
+    ],
+    "missing_sections": ["<section_name>"]
+  },
+
+  "cover_letter": "<~180 word cover letter string or empty string>",
+
+  "checklist": {
+    "ats_score_pass": <boolean>,
+    "verdict_status": "PASS" | "BORDERLINE" | "FAIL",
+    "formatting_safe": <boolean>,
+    "missing_keywords_acceptable": <boolean>,
+    "latex_generated": <boolean>,
+    "suggested_keywords_present": <boolean>,
+    "cover_letter_ready": <boolean>,
+    "overall_ready": <boolean>
+  },
+
+  "diff": {
+    "available": <boolean — true only if input_mode is "latex">,
+    "lines": [
+      {
+        "type": "added" | "removed" | "unchanged",
+        "content": "<line text>"
+      }
+    ]
+  }
+}
+
+---
+
+## LATEX GENERATION RULES
+
+- Output must be 100% compilable on Overleaf with no errors.
+- One page maximum. Never exceed one page.
+- Use the template matching template_id. If unknown, default to
+  jake-classic.
+- Do not use tables, multi-column layouts, graphics, icons,
+  or anything that breaks ATS parsers (Workday, Greenhouse, Lever).
+- All bullet points must start with strong action verbs.
+- Quantify at least 60% of experience bullets with numbers/metrics.
+- Preserve all factual information from the original resume.
+  Never fabricate experience, education, or credentials.
+- You may rephrase, reorder, and strengthen bullets.
+- Inject missing keywords naturally into bullets or skills section
+  only if factually plausible.
+
+---
+
+## HTML PREVIEW RULES
+
+- Generate a minimal HTML string that visually mimics a PDF resume.
+- Include: name, contact line, section headers, entries, bullets.
+- Use inline styles only. No external CSS. No scripts.
+- Keep it under 3000 characters. This is a preview, not a full render.
+
+---
+
+## ATS SCORING RULES
+
+- overall_score = sum of all 4 sub-scores (max 100).
+- PASS: score >= 70
+- BORDERLINE: score 50-69
+- FAIL: score < 50
+- keyword_density: score based on % of expected keywords present.
+  Full 25 if >80% present, scale down proportionally.
+- ats_formatting: start at 25, deduct 5 per formatting issue found.
+- section_order: score based on how close detected order is to
+  optimal for the role type (SWE, Data, Business, etc.).
+- readability_bullets: score based on action verb strength (0-10)
+  and quantification rate (0-15).
+
+---
+
+## IMPROVEMENTS RULES
+
+- Produce exactly 5-8 improvements. Never fewer than 5.
+- Label each HIGH / MEDIUM / LOW based on ATS impact.
+- Be specific: name the section, bullet, or issue directly.
+  Bad: "Add more metrics." 
+  Good: "Quantify your SmartBridge internship — add the number of
+  records processed and dashboard views."
+- Do not repeat the same advice across items.
+
+---
+
+## COVER LETTER RULES
+
+- Only generate if generate_cover_letter is true.
+- Target length: ~180 words. Never exceed 220.
+- If JD is provided: tailor to the JD's role, company tone,
+  and top 3 required skills.
+- If JD is empty: tailor to inferred role from resume.
+- Format: 3 paragraphs — hook, proof, close.
+- Do not use filler phrases like "I am excited to apply" or
+  "I am a passionate professional."
+- Write in first person, confident tone, specific to the candidate.
+
+---
+
+## DIFF RULES
+
+- Only compute diff if input_mode is "latex".
+- Compare original LaTeX lines to generated LaTeX lines.
+- Tag each line as added, removed, or unchanged.
+- If input_mode is not "latex", set diff.available to false
+  and diff.lines to empty array.
+
+---
+
+## MISSING SECTION RECOVERY
+
+- If any standard section is absent from the resume
+  (Education, Skills, Experience, Projects, Certifications),
+  add its name to ats_report.missing_sections array.
+- Do not fabricate content for missing sections in the LaTeX output.
+  Leave them as empty section headers with a comment:
+  % MISSING — user must fill this section
+
+---
+
+## ABSOLUTE RULES
+
+1. Never fabricate degrees, companies, projects, or credentials.
+2. Never exceed one page in LaTeX output.
+3. Always return valid JSON. No trailing commas. No comments in JSON.
+4. Never include markdown code fences in your response.
+5. If the resume content is empty or unreadable, return an error:
+   { "error": "Resume content is empty or could not be parsed." }`;
+
+            var userPayload = {
+                resume_content: resume,
+                input_mode: aiInputMode,
+                jd: jd,
+                target_role: activeRole,
+                industry: activeInd,
+                template_id: selTpl,
+                template_hint: hint,
+                generate_cover_letter: wC
+            };
+
+            var usr = JSON.stringify(userPayload, null, 2);
+
+            isGen = true; R = {};
+            var btn = document.getElementById('run-btn');
+            btn.disabled = true;
+            document.getElementById('run-ico').innerHTML = '<span class="spin"></span>';
+            document.getElementById('run-lbl').textContent = 'Generating…';
+            var pr = document.getElementById('prog'); pr.style.width = '0%'; pr.classList.add('live');
+            document.getElementById('err-banner').style.display = 'none';
+
+            var ob = document.getElementById('out-body');
+            ob.innerHTML = '<div class="loading-state"><div class="ls-pre">— AI is working</div><ul class="ls-steps">' +
+                STEPS.map(function (s, i) { return '<li class="ls-step" id="st' + i + '"><span class="ls-step-n">0' + (i + 1) + '</span><span class="ls-step-t">' + s + '</span></li>'; }).join('') +
+                '</ul></div>';
+            document.getElementById('results-section').style.display = 'block';
+            window.scrollTo({ top: document.getElementById('results-section').offsetTop - 80, behavior: 'smooth' });
+
+            var si = 0; if (stepTmr) clearInterval(stepTmr);
+            stepTmr = setInterval(function () {
+                if (si > 0) { var prev = document.getElementById('st' + (si - 1)); if (prev) { prev.classList.remove('on'); prev.classList.add('done'); } }
+                var cur = document.getElementById('st' + si); if (cur) cur.classList.add('on');
+                si++; if (si >= STEPS.length) clearInterval(stepTmr);
+            }, 2400);
+
+            try {
+                setTimeout(function () { pr.style.width = '30%'; }, 300);
+                var raw = await callAI(sys, usr);
+                pr.style.width = '90%';
+                
+                var clean = raw.replace(/```json|```/g, "").trim();
+                var parsed;
+                try {
+                    parsed = JSON.parse(clean);
+                } catch (_) {
+                    var m = clean.match(/\{[\s\S]*\}/);
+                    if (m) parsed = JSON.parse(m[0]);
+                    else throw new Error('Could not parse AI response as JSON. The response may be truncated — please try again.');
+                }
+                
+                R = parsed;
+                pr.style.width = '100%';
+                setTimeout(function () { pr.style.width = '0%'; pr.classList.remove('live'); }, 500);
+            } catch (err) {
+                R = {};
+                pr.style.width = '0%'; pr.classList.remove('live');
+                var eb = document.getElementById('err-banner');
+                eb.innerHTML = '<strong>Error:</strong> ' + ex(err.message) + '. Check your API key and try again.';
+                eb.style.display = 'block';
+            }
+
+            if (stepTmr) clearInterval(stepTmr);
+            isGen = false;
+            btn.disabled = false;
+            document.getElementById('run-ico').textContent = '⚡';
+            document.getElementById('run-lbl').textContent = 'Generate';
+            
+            if (R.ats_report) renderResults();
+        }
+
+        // ── RENDER RESULTS ──
+        function jumpLink(id, label) {
+            return '<span class="jump-link" onclick="document.getElementById(\'' + id + '\').scrollIntoView({behavior:\'smooth\'})">' + label + '</span>';
+        }
+
+        function renderResults() {
+            var d = R.ats_report || {};
+            var ms = d.overall_score || 0;
+            var verdict = d.verdict || 'FAIL';
+            var offset = 314.16 - (ms / 100 * 314.16);
+            var isL = mode === 'latex';
+
+            var ringColorClass = 'lo';
+            var verdictColor = 'var(--warn)';
+            if (ms >= 70) {
+                ringColorClass = 'hi';
+                verdictColor = 'var(--accent-txt)';
+            } else if (ms >= 50) {
+                ringColorClass = 'mid';
+                verdictColor = 'var(--amber-txt)';
+            }
+
+            // Missing section warnings
+            var missingSectionsHtml = '';
+            if (d.missing_sections && d.missing_sections.length > 0) {
+                missingSectionsHtml = '<div class="miss-chip-container">' +
+                    d.missing_sections.map(function(sec) {
+                        var safeSec = sec.replace(/\s+/g, '-');
+                        return '<div class="miss-chip" id="miss-card-' + safeSec + '">' +
+                            '<span class="miss-label">⚠️ Missing Section: <strong>' + ex(sec) + '</strong></span>' +
+                            '<div class="miss-actions">' +
+                                '<button class="miss-btn ai-fill-btn" onclick="aiFillSection(\'' + sec.replace(/'/g, "\\'") + '\')">AI Fill</button>' +
+                                '<button class="miss-btn scroll-btn" onclick="scrollToSection(\'' + sec.replace(/'/g, "\\'") + '\')">Fill Myself</button>' +
+                                '<button class="miss-btn skip-btn" onclick="dismissMissChip(\'' + sec.replace(/'/g, "\\'") + '\')">Skip</button>' +
+                            '</div>' +
+                            '<div class="ai-fill-output" id="ai-fill-out-' + safeSec + '" style="display:none; margin-top:10px;">' +
+                                '<textarea readonly class="modal-input" style="font-family:var(--mono); font-size:11px; height:100px; width:100%; resize:vertical;"></textarea>' +
+                                '<button class="cpbtn" id="cpbtn-snip-' + safeSec + '" onclick="copySnippet(\'' + sec.replace(/'/g, "\\'") + '\')" style="margin-top: 6px;">Copy LaTeX Snippet</button>' +
+                            '</div>' +
+                        '</div>';
+                    }).join('') +
+                '</div>';
+            }
+
+            var jumps = [
+                '<span class="jump-pre">Jump to:</span>',
+                jumpLink('r-ats', 'ATS Report'),
+                jumpLink('r-output', 'LaTeX &amp; Preview')
+            ];
+            if (isL && R.diff && R.diff.available && R.diff.lines && R.diff.lines.length) {
+                jumps.push(jumpLink('r-diff', 'Diff'));
+            }
+            if (R.cover_letter) {
+                jumps.push(jumpLink('r-cover', 'Cover Letter'));
+            }
+            jumps.push(jumpLink('r-check', 'Checklist'));
+            var html = missingSectionsHtml + '<div class="jump-bar">' + jumps.join('') + '</div>';
+
+            // SVG Donut Ring Chart HTML
+            var donutHtml = '<div class="donut-chart-container">' +
+                '<svg class="sc-ring ' + ringColorClass + '" viewBox="0 0 120 120" width="120" height="120">' +
+                    '<circle class="ring-bg" cx="60" cy="60" r="50" fill="transparent" stroke="var(--hairline)" stroke-width="8" />' +
+                    '<circle class="ring-fg" id="score-ring-fill" cx="60" cy="60" r="50" fill="transparent" stroke-width="8" ' +
+                        'stroke-dasharray="314.16" stroke-dashoffset="314.16" stroke-linecap="round" transform="rotate(-90 60 60)" />' +
+                '</svg>' +
+                '<div class="donut-chart-text">' +
+                    '<span class="donut-score">' + ms + '</span>' +
+                    '<span class="donut-verdict" style="color:' + verdictColor + ';">' + verdict + '</span>' +
+                '</div>' +
+            '</div>';
+
+            // Sub-Scores
+            var subScores = d.sub_scores || {};
+            var subScoresHtml = '<div class="sub-scores-grid">';
+            var subList = [
+                { key: 'keyword_density', label: 'Keyword Density' },
+                { key: 'ats_formatting', label: 'ATS Formatting' },
+                { key: 'section_order', label: 'Section Order' },
+                { key: 'readability_bullets', label: 'Readability & Bullets' }
+            ];
+            subList.forEach(function(sub) {
+                var subData = subScores[sub.key] || { score: 0, max: 25, note: '' };
+                var scoreVal = subData.score || 0;
+                var maxVal = subData.max || 25;
+                var pct = (scoreVal / maxVal) * 100;
+                var color = scoreVal >= maxVal * 0.8 ? 'var(--accent)' : scoreVal >= maxVal * 0.6 ? '#c8a000' : 'var(--warn)';
+                
+                subScoresHtml += '<div class="sub-sc-card">' +
+                    '<div class="sub-sc-hdr">' +
+                        '<span class="sub-sc-title">' + sub.label + '</span>' +
+                        '<span class="sub-sc-val">' + scoreVal + '/' + maxVal + '</span>' +
+                    '</div>' +
+                    '<div class="sub-sc-bar"><div class="sub-sc-fill" style="width:' + pct + '%; background:' + color + ';"></div></div>' +
+                    '<p class="sub-sc-note">' + ex(subData.note) + '</p>' +
+                '</div>';
+            });
+            subScoresHtml += '</div>';
+
+            var roleInferredText = d.role_inferred ? '<p class="atext" style="margin-top:-8px; margin-bottom:18px; text-align:center; font-style:italic;">Inferred Target Role: <strong>' + ex(d.role_inferred) + '</strong></p>' : '';
+
+            // ATS Report card
+            html += '<div class="rcard" id="r-ats"><div class="rcard-lbl">ATS Report</div>' +
+                roleInferredText +
+                donutHtml +
+                subScoresHtml +
+                '<div class="chip-section"><div class="chip-section-lbl">🔴 Missing Keywords (expecting, not in resume)</div><div class="chips">' +
+                    ((d.keywords && d.keywords.missing && d.keywords.missing.length) ? d.keywords.missing.map(function(k) { return '<span class="chip chip-miss">' + ex(k) + '</span>'; }).join('') : '<span class="chip chip-neu">None</span>') +
+                '</div></div>' +
+                '<div class="chip-section"><div class="chip-section-lbl">🟢 Present Keywords (already matching)</div><div class="chips">' +
+                    ((d.keywords && d.keywords.present && d.keywords.present.length) ? d.keywords.present.map(function(k) { return '<span class="chip chip-hit">' + ex(k) + '</span>'; }).join('') : '<span class="chip chip-neu">None</span>') +
+                '</div></div>' +
+                '<div class="chip-section"><div class="chip-section-lbl">🔵 Suggested Additions (role-inferred, click to copy)</div><div class="chips">' +
+                    ((d.keywords && d.keywords.suggested && d.keywords.suggested.length) ? d.keywords.suggested.map(function(k) { return '<span class="chip chip-sug" onclick="copyChipText(\'' + k.replace(/'/g, "\\'") + '\', this)">' + ex(k) + '</span>'; }).join('') : '<span class="chip chip-neu">None</span>') +
+                '</div></div>';
+
+            // Actionable improvements
+            if (d.improvements && d.improvements.length > 0) {
+                html += '<div class="impr-panel">' +
+                    '<div style="font-size:12px; font-weight:600; color:var(--ink); margin-bottom:10px; margin-top:16px;">Actionable Improvements</div>' +
+                    '<div class="impr-list" style="display:flex; flex-direction:column; gap:8px;">' +
+                        d.improvements.map(function(impr) {
+                            var prio = (impr.priority || 'MEDIUM').toUpperCase();
+                            var badgeClass = prio === 'HIGH' ? 'high' : prio === 'LOW' ? 'low' : 'med';
+                            return '<div class="impr-item" style="display:flex; align-items:flex-start; gap:8px; font-size:12.5px; line-height:1.5;">' +
+                                '<span class="impr-badge ' + badgeClass + '">' + prio + '</span>' +
+                                '<span class="impr-txt">' + ex(impr.suggestion) + '</span>' +
+                            '</div>';
+                        }).join('') +
+                    '</div>' +
+                '</div>';
+            }
+            html += '</div>';
+
+            // LaTeX + Preview (tabbed)
+            html += '<div class="rcard" id="r-output"><div class="rcard-lbl">LaTeX Code &amp; Preview</div>' +
+                '<div class="out-tabs">' +
+                '<button class="otab on" id="ot-latex" onclick="switchOutTab(\'latex\')">LaTeX Source</button>' +
+                '<button class="otab" id="ot-preview" onclick="switchOutTab(\'preview\')">HTML Preview</button>' +
+                '</div>' +
+                '<div class="out-pane show" id="op-latex">' +
+                '<div class="code-meta">Template: <span>' + ex(selTpl) + '</span> &nbsp;·&nbsp; Copy → Overleaf → Compile → Export PDF</div>' +
+                '<div class="code-box">' + ex(R.latex || '') + '</div>' +
+                '<div style="display:flex; gap:8px; margin-top:8px;">' +
+                    '<button class="cpbtn" id="cpbtn-latex" onclick="cpTxt(R.latex,\'cpbtn-latex\')" style="flex:1; margin-top:0;">Copy full LaTeX code</button>' +
+                    '<button class="cpbtn" id="open-overleaf-btn" onclick="openOverleaf()" style="flex:1; margin-top:0; background:var(--accent-bg); border-color:var(--accent); color:var(--accent-txt);">Open in Overleaf</button>' +
+                '</div>' +
+                '</div>' +
+                '<div class="out-pane" id="op-preview">' +
+                parsePDF(R.latex || '') +
+                '<p style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Approximate preview — compile on <a href="https://www.overleaf.com" target="_blank" style="color:var(--accent-txt)">Overleaf</a> for exact output.</p>' +
+                '<button class="cpbtn" id="cpbtn-prev" onclick="cpTxt(R.latex,\'cpbtn-prev\')" style="margin-top:8px">Copy LaTeX to compile</button>' +
+                '</div></div>';
+
+            // Collapsible Diff (LaTeX mode only)
+            if (isL && R.diff && R.diff.available && R.diff.lines && R.diff.lines.length) {
+                html += '<div class="rcard" id="r-diff">' +
+                    '<div class="acc-hd" onclick="toggleAcc(this)">' +
+                        '<div class="acc-hd-l"><span class="acc-dot"></span><span class="acc-title">Diff — Changes vs Base</span></div>' +
+                        '<span class="acc-chev open">▾</span>' +
+                    '</div>' +
+                    '<div class="acc-body show" style="padding:12px;">' +
+                        '<div class="diff-box" style="font-family:var(--mono); font-size:11px; line-height:1.6; max-height:400px; overflow-y:auto; border-radius:3px; border:1px solid var(--hairline);">' +
+                            R.diff.lines.map(function(line) {
+                                var lineClass = 'dl-unchanged';
+                                var prefix = '  ';
+                                if (line.type === 'added') { lineClass = 'dl-added'; prefix = '+ '; }
+                                else if (line.type === 'removed') { lineClass = 'dl-removed'; prefix = '- '; }
+                                return '<div class="' + lineClass + '">' + prefix + ex(line.content) + '</div>';
+                            }).join('') +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }
+
+            // Cover Letter
+            if (R.cover_letter) {
+                html += '<div class="rcard" id="r-cover"><div class="rcard-lbl">Cover Letter</div>' +
+                    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+                        '<span class="cover-word-count" id="cover-wc" style="font-family:var(--mono); font-size:10px; color:var(--muted);">Word Count: 0</span>' +
+                        '<button class="nav-btn" id="cover-edit-btn" onclick="toggleCoverEdit()" style="font-size:10px;">✎ Edit</button>' +
+                    '</div>' +
+                    '<div id="cover-box-view" class="cover-box">' + ex(R.cover_letter) + '</div>' +
+                    '<textarea id="cover-box-edit" class="modal-input" style="display:none; font-family:var(--serif); font-size:14px; line-height:1.85; padding:18px 22px; background:var(--paper); height:300px; resize:vertical; width:100%; border:1px solid var(--hairline); border-radius:3px;">' + ex(R.cover_letter) + '</textarea>' +
+                    '<div class="modal-warn" id="cover-warn" style="margin-top:8px; margin-bottom:8px; display:none;">⚠️ Word count exceeds 220 words. Consider making it more concise for maximum recruiter engagement.</div>' +
+                    '<button class="cpbtn" id="cpbtn-cover" onclick="copyCover()" style="margin-top:8px;">Copy cover letter</button>' +
+                    '</div>';
+            }
+
+            // Pre-Apply Checklist
+            var checklist = R.checklist || {};
+            var chkItems = [
+                { t: 'ATS Score ≥ 70 (yours: ' + ms + ')', p: ms >= 70 },
+                { t: 'Verdict Status: ' + verdict, p: verdict === 'PASS' },
+                { t: 'Formatting Safe (no ATS-breaking elements)', p: checklist.formatting_safe !== false },
+                { t: 'Missing Keywords < 3', p: (d.keywords && d.keywords.missing ? d.keywords.missing.length < 3 : true) },
+                { t: 'LaTeX Generated', p: !!R.latex },
+                { t: 'Suggested Keywords Reviewed', p: true },
+                { t: 'Cover Letter Ready', p: R.cover_letter ? true : !wC }
+            ];
+            var allPass = chkItems.every(function (i) { return i.p; });
+
+            html += '<div class="rcard" id="r-check"><div class="rcard-lbl">Pre-Apply Checklist</div>' +
+                '<div class="chk-list">' + chkItems.map(function(i) {
+                    return '<div class="ci ' + (i.p ? 'pass' : 'fail') + '">' +
+                        '<span class="ci-ico">' + (i.p ? '✓' : '✗') + '</span>' +
+                        '<span class="ci-txt">' + i.t + '</span>' +
+                    '</div>';
+                }).join('') + '</div>' +
+                '<div class="verdict ' + (allPass ? 'ok' : 'wait') + '">' +
+                (allPass ? 'Ready to apply! ✅ Copy the LaTeX, compile on Overleaf, export PDF, and submit.' :
+                    'Not Ready ❌ — review the ATS Report and fix the remaining checklist items.') +
+                '</div></div>';
+
+            document.getElementById('out-body').innerHTML = html;
+
+            // Animate SVG score-ring
+            setTimeout(function() {
+                var ring = document.getElementById('score-ring-fill');
+                if (ring) ring.style.strokeDashoffset = offset;
+            }, 100);
+
+            if (R.cover_letter) updateCoverWc();
+        }
+
+        function switchOutTab(tab) {
+            document.getElementById('ot-latex').classList.toggle('on', tab === 'latex');
+            document.getElementById('ot-preview').classList.toggle('on', tab === 'preview');
+            document.getElementById('op-latex').classList.toggle('show', tab === 'latex');
+            document.getElementById('op-preview').classList.toggle('show', tab === 'preview');
+        }
+
+        // ── COVER LETTER EDIT UTILS ──
+        function toggleCoverEdit() {
+            var view = document.getElementById('cover-box-view');
+            var edit = document.getElementById('cover-box-edit');
+            var btn = document.getElementById('cover-edit-btn');
+            
+            if (edit.style.display === 'none') {
+                edit.value = view.textContent;
+                view.style.display = 'none';
+                edit.style.display = 'block';
+                btn.textContent = '✓ Done';
+            } else {
+                view.textContent = edit.value;
+                R.cover_letter = edit.value;
+                view.style.display = 'block';
+                edit.style.display = 'none';
+                btn.textContent = '✎ Edit';
+                updateCoverWc();
+            }
+        }
+
+        function updateCoverWc() {
+            var view = document.getElementById('cover-box-view');
+            if (!view) return;
+            var text = view.textContent;
+            var wc = text.trim().split(/\s+/).filter(Boolean).length;
+            document.getElementById('cover-wc').textContent = 'Word Count: ' + wc;
+            var warn = document.getElementById('cover-warn');
+            if (wc > 220) {
+                warn.style.display = 'block';
+            } else {
+                warn.style.display = 'none';
+            }
+        }
+
+        function copyCover() {
+            var text = document.getElementById('cover-box-view').textContent;
+            cpTxt(text, 'cpbtn-cover');
+        }
+
+        // ── MISSING SECTIONS RECOVERY ACTIONS ──
+        function dismissMissChip(sec) {
+            var card = document.getElementById('miss-card-' + sec.replace(/\s+/g, '-'));
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(8px)';
+                setTimeout(function() { card.remove(); }, 200);
+            }
+        }
+
+        function scrollToSection(sec) {
+            // [v4] scroll to specific form accordion card in build mode
+            setMode('build');   // was form
+            var secId = '';
+            var s = sec.toLowerCase();
+            if (s.includes('edu')) secId = 'edu-list';
+            else if (s.includes('skill')) secId = 'f-langs';
+            else if (s.includes('proj')) secId = 'proj-list';
+            else if (s.includes('exp') || s.includes('work') || s.includes('intern')) secId = 'exp-list';
+            else if (s.includes('cert')) secId = 'cert-list';
+            else if (s.includes('ach')) secId = 'ach-list';
+            
+            if (secId) {
+                var el = document.getElementById(secId);
+                if (el) {
+                    var acc = el.closest('.acc');
+                    if (acc) {
+                        var body = acc.querySelector('.acc-body');
+                        var chev = acc.querySelector('.acc-chev');
+                        if (body && !body.classList.contains('show')) {
+                            body.classList.add('show');
+                            if (chev) chev.classList.add('open');
+                        }
+                    }
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.focus();
+                }
+            }
+        }
+
+        async function aiFillSection(sec) {
+            var safeSec = sec.replace(/\s+/g, '-');
+            var btn = document.querySelector('#miss-card-' + safeSec + ' .ai-fill-btn');
+            var outDiv = document.getElementById('ai-fill-out-' + safeSec);
+            var textarea = outDiv.querySelector('textarea');
+            
+            btn.disabled = true;
+            btn.textContent = 'Generating…';
+            
+            var inferredRole = R.ats_report.role_inferred || 'Software Developer';
+            
+            var sys = 'You are an expert resume assistant. Generate a compilable LaTeX snippet for the requested section of a resume matching the template. ' +
+                      'Respond with a single valid JSON object containing a "latex_snippet" field. No markdown fences, no formatting outside the JSON.';
+                      
+            var usr = 'Generate a plausible placeholder ' + sec + ' section for a ' + inferredRole + ' resume. ' +
+                      'Keep it concise, professional, and ATS-safe. Target template: ' + selTpl + '. Return JSON with "latex_snippet" key.';
+                      
+            try {
+                var raw = await callAI(sys, usr);
+                var clean = raw.replace(/```json|```/g, "").trim();
+                var data;
+                try {
+                    data = JSON.parse(clean);
+                } catch (_) {
+                    var match = clean.match(/\{[\s\S]*\}/);
+                    if (match) data = JSON.parse(match[0]);
+                    else throw new Error("Could not parse AI response.");
+                }
+                var snippet = data.latex_snippet || data.snippet || '';
+                textarea.value = snippet;
+                outDiv.style.display = 'block';
+                btn.textContent = 'Regenerate';
+                btn.disabled = false;
+            } catch (err) {
+                alert('AI Fill failed: ' + err.message);
+                btn.textContent = 'AI Fill';
+                btn.disabled = false;
+            }
+        }
+
+        function copySnippet(sec) {
+            var safeSec = sec.replace(/\s+/g, '-');
+            var outDiv = document.getElementById('ai-fill-out-' + safeSec);
+            var text = outDiv.querySelector('textarea').value;
+            cpTxt(text, 'cpbtn-snip-' + safeSec);
+        }
+
+        // ── PDF PREVIEW PARSER ──
+        function parsePDF(latex) {
+            if (!latex) return '<div style="padding:32px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;border:1px dashed var(--hairline);border-radius:3px">No LaTeX generated yet</div>';
+            try {
+                var nM = latex.match(/\\Large[^}]*\\textbf\{([^}]+)\}/) || latex.match(/\\textbf\{([A-Z][^}]{2,40})\}/);
+                var name = nM ? nM[1] : 'Your Name';
+                var eM = latex.match(/href\{mailto:[^}]+\}\{([^}]+)\}/);
+                var email = eM ? eM[1] : '';
+                var phM = latex.match(/faPhone[^{]*\{?([\+\d\s\-]{7,})/) || latex.match(/(\+?\d[\d\s\-]{6,})/);
+                var phone = phM ? phM[1].trim() : '';
+                var lM = latex.match(/linkedin\.com\/in\/([^\s}\\]+)/);
+                var linkedin = lM ? 'linkedin.com/in/' + lM[1] : '';
+                var gM = latex.match(/github\.com\/([^\s}\\]+)/);
+                var github = gM ? 'github.com/' + gM[1] : '';
+                var contact = [email, phone, linkedin, github].filter(Boolean).join(' | ');
+
+                var secs = []; var sr = /\\section\*?\{([^}]+)\}([\s\S]*?)(?=\\section|\\end\{document\})/g; var sm;
+                while ((sm = sr.exec(latex)) !== null) secs.push({ t: sm[1].replace(/\\[a-z]+/g, '').trim(), b: sm[2] });
+
+                var h = '<div class="pdf-page"><div class="pdf-name">' + ex(name) + '</div><div class="pdf-contact">' + ex(contact) + '</div>';
+
+                secs.forEach(function (sec) {
+                    h += '<div class="pdf-sec">' + ex(sec.t) + '</div>';
+                    var subs = [];
+                    var subR = /\\resumeSubheading\{([^}]+)\}\{([^}]+)\}\{([^}]+)\}\{([^}]*)\}/g; var sbm;
+                    while ((sbm = subR.exec(sec.b)) !== null) subs.push({ o: sbm[1], d: sbm[2], r: sbm[3], l: sbm[4] });
+                    var projR = /\\resumeProjectHeading\{([^}]+)\}\{([^}]*)\}/g; var pm;
+                    while ((pm = projR.exec(sec.b)) !== null) {
+                        var pn = pm[1].replace(/\\textbf\{([^}]+)\}/g, '$1').replace(/\\emph\{([^}]+)\}/g, '$1').replace(/\$\|?\$/g, '·').replace(/\\[a-z]+/g, '').replace(/[{}]/g, '').trim();
+                        subs.push({ o: pn, d: pm[2], r: '', l: '' });
+                    }
+                    var bullets = []; var bR = /\\resumeItem\{([^}]+)\}|\\item\s+([^\n]{4,})/g; var bm;
+                    while ((bm = bR.exec(sec.b)) !== null) {
+                        var bt = (bm[1] || bm[2] || '').replace(/\{[^}]*\}/g, '').replace(/\\[a-z]+\*?\s?/g, '').trim();
+                        if (bt.length > 3) bullets.push(bt);
+                    }
+                    if (subs.length) {
+                        subs.forEach(function (s, si) {
+                            h += '<div class="pdf-entry"><div class="pdf-hd"><span>' + ex(s.o) + '</span><span>' + ex(s.d) + '</span></div>';
+                            if (s.r || s.l) h += '<div class="pdf-sub"><span>' + ex(s.r) + '</span><span>' + ex(s.l) + '</span></div>';
+                            var eb = bullets.slice(si * 3, si * 3 + 4);
+                            if (eb.length) h += '<ul class="pdf-ul">' + eb.map(function (x) { return '<li>' + ex(x.slice(0, 130)) + '</li>'; }).join('') + '</ul>';
+                            h += '</div>';
+                        });
+                    } else if (bullets.length) {
+                        h += '<ul class="pdf-ul">' + bullets.slice(0, 8).map(function (x) { return '<li>' + ex(x.slice(0, 130)) + '</li>'; }).join('') + '</ul>';
+                    } else {
+                        var raw = sec.b.replace(/\\[a-zA-Z]+(\[[^\]]*\])?\{?/g, '').replace(/[{}]/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
+                        if (raw) h += '<p style="font-size:8.5px;color:#555;margin:0">' + ex(raw) + '</p>';
+                    }
+                });
+                if (!secs.length) h += '<p style="font-size:9px;text-align:center;color:#888;padding:20px">Open in Overleaf for accurate rendering.</p>';
+                return h + '</div>';
+            } catch (e) {
+                return '<div style="padding:24px;text-align:center;color:var(--muted);font-size:12px">LaTeX generated — open in Overleaf for accurate rendering.</div>';
+            }
+        }
+
+        // ── INIT ──
+        // [v4] updated template initialization list and defaults
+        initTpls();
+        ['edu', 'proj', 'cert', 'ach'].forEach(function (t) { addEntry(t); });
+        initDropzone();
+        setMode('source'); // default mode on load is source
+    </script>
+</body>
+
+</html>

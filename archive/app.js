@@ -37,15 +37,16 @@
                     });
                     var d = await res.json();
                     if (d.error) throw new Error(d.error.message || 'Claude API error');
-                    return (d.content || []).filter(function (b) { return b.type === 'text'; }).map(function (b) { return b.text; }).join('');
+                    let text = (d.content || []).filter(function (b) { return b.type === 'text'; }).map(function (b) { return b.text; }).join('');
+                    if (!text) throw new Error('Empty response from Claude');
+                    return text;
                 }
             },
             gemini: {
                 label: 'Gemini',
                 models: [
-                    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
-                    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
-                    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' }
+                    { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+                    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' }
                 ],
                 call: async function (model, system, user, apiKey) {
                     var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey, {
@@ -58,7 +59,9 @@
                     });
                     var d = await res.json();
                     if (d.error) throw new Error(d.error.message || 'Gemini API error');
-                    return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    let text = d.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!text) throw new Error('Empty response from Gemini');
+                    return text;
                 }
             },
             openai: {
@@ -76,7 +79,9 @@
                     });
                     var d = await res.json();
                     if (d.error) throw new Error(d.error.message || 'OpenAI API error');
-                    return d.choices?.[0]?.message?.content || '';
+                    let content = d.choices?.[0]?.message?.content;
+                    if (!content) throw new Error('Empty response from OpenAI');
+                    return content;
                 }
             }
         };
@@ -639,8 +644,12 @@
                 var raw = await callAI(sys, usr);
                 tp.style.width = '88%';
                 var parsed;
-                try { parsed = JSON.parse(raw); }
-                catch (_) { var m = raw.match(/\{[\s\S]*\}/); if (m) parsed = JSON.parse(m[0]); else throw new Error('Could not parse response — please try again.'); }
+                console.log('Raw AI response:', raw);
+                // Check for empty response
+                if (!raw || raw.trim() === '') {
+                    throw new Error('Empty response from AI provider');
+                }
+                try { parsed = JSON.parse(raw); } catch (e) { console.error('JSON parse error:', e); var m = raw.match(/\{[\s\S]*\}/); if (m) parsed = JSON.parse(m[0]); else throw new Error('Could not parse response — please try again.'); }
                 R = parsed;
                 tp.style.width = '100%';
                 setTimeout(function () {
