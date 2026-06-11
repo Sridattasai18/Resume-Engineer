@@ -1,82 +1,65 @@
 # Resume Engineer
 
-> **Tailor your resume to clear the ATS machine in one shot.**
-
-Resume Engineer is an interactive AI-powered resume customization assistant designed specifically for developers, software engineers, and data scientists. By matching your base resume (either raw LaTeX code, plain text, or a PDF upload) against a target Job Description, it generates an optimized LaTeX resume, compiles a targeted cover letter, displays a side-by-side diff of tailored enhancements, and runs an ATS simulation report—all in one shot.
+Tired of sending the same resume to every job and hearing nothing back? Resume Engineer helps you tailor your resume to a specific job description in seconds — AI-powered, runs entirely in your browser, no installations needed.
 
 ---
 
-## Versions & Releases
+## What it does
 
-This repository contains two main versions of the application:
-
-### 🚀 Version 2 (Latest — Recommended)
-Located in [`Version2/index.html`](file:///c:/Users/kalig/OneDrive/Desktop/Jar/RE-V2/Version2/index.html).
-- **Architecture**: Single-file, client-side only serverless web application (HTML + CSS + JS in a single file).
-- **Prerequisites**: None! Double-click `Version2/index.html` to open it in your browser directly (no server, no node, no npm required).
-- **Features**:
-  - **3 Input Tabs**:
-    1. **Source**: Drag & drop PDF/TXT/MD files (text extracted client-side via `PDF.js`) or paste raw resume text.
-    2. **LaTeX**: Directly paste your LaTeX base code (AI tailors it end-to-end).
-    3. **Build**: Fill in accordion form builder fields manually.
-  - **API Keys**: Supports **Google AI Studio (Gemini API)** and **OpenRouter** (supporting 5 models) stored securely inside browser `localStorage`.
-  - **ATS Score Donut Chart**: Animated SVG loading progress ring showing match score thresholds (PASS/BORDERLINE/FAIL).
-  - **ATS Sub-Scores**: 4 cards detailing Keyword Density, ATS Formatting, Section Order, and Readability & Bullets out of 25.
-  - **3-Layer Keyword Chips**: Visualizes present (green), missing (red), and suggested click-to-copy additions (blue) with toast confirmations.
-  - **Actionable Improvements**: 5-8 recommendations prioritizing fixes by severity (HIGH/MED/LOW).
-  - **Line-by-Line Monospace Diff**: Collapsible colored diff showing added (+) and removed (-) LaTeX lines.
-  - **Missing Section Warnings**: Warning chips offering [AI Fill] (triggers a secondary targeted JSON API query), [Fill Myself] (focuses and scrolls to the form builder accordion), or [Skip].
-  - **Pre-Apply Checklist**: Verifies 7 criteria for a final "Ready to Apply ✅" indicator.
-  - **Cover Letter Editor**: Inline editor showing word counts and warnings if letter length > 220 words.
-  - **Overleaf Integration**: Submit the customized LaTeX directly to the Overleaf editor snip compiler.
-
-### 🐍 Version 1 (Classic Flask Server)
-Located in the repository root (`app.py`, `templates/`, `static/`).
-- **Architecture**: Server-based Flask (Python) web application.
-- **Prerequisites**: Python 3.8+ installed, package configuration via `requirements.txt`.
-- **Features**: Extracts text from PDF uploads server-side using `pypdf`, and queries model handlers on the backend.
+Paste your resume, drop in a job description, and it gives you back:
+- A tailored LaTeX resume ready to compile
+- An ATS score so you know where you stand
+- A cover letter written for that specific role
+- A checklist to make sure you're actually ready to apply
 
 ---
 
-## Quick Start (Version 2)
+## There are two versions
 
-1. Open [`Version2/index.html`](file:///c:/Users/kalig/OneDrive/Desktop/Jar/RE-V2/Version2/index.html) in your browser.
-2. Enter your API Key in the Settings Modal (Gemini API key from Google AI Studio is recommended).
-3. Set your input tab (**Source**, **LaTeX**, or **Build**) and add your target Job Description.
-4. Click **Generate** and view your optimized LaTeX, ATS report, and cover letter.
+### Version 2 — use this one
+Open `Version2/index.html` directly in your browser. That's it. No server, no setup, no npm.
+
+**Ways to input your resume:**
+- **Upload** — drag and drop a PDF, TXT, or MD file
+- **LaTeX** — paste your existing LaTeX source
+- **Build** — fill in a form if you're starting from scratch
+
+**What you get back:**
+- Tailored LaTeX resume (send it to Overleaf to get a PDF)
+- ATS score breakdown across 4 categories
+- Keywords you're missing vs. keywords you already have
+- A cover letter (editable in-browser)
+- Line-by-line diff showing what changed
+- Alerts for missing sections with an option to let AI fill them in
+
+**API keys:** Supports Gemini (Google AI Studio) and OpenRouter. Keys stay in your browser's localStorage — nothing leaves your device except the API call itself.
 
 ---
 
-## Quick Start (Version 1 — Flask App)
+### Version 1 — the original Flask app
+Runs on a Python server locally. Useful if you want a backend-based setup.
 
-### 1. Installation
-Clone the repository and install the Python requirements:
 ```bash
 git clone https://github.com/Sridattasai18/Resume-Engineer.git
 cd Resume-Engineer
 pip install -r requirements.txt
-```
-
-### 2. Configure Environment (Optional)
-Specify your Gemini key as an environment variable to use it as the backend fallback default:
-```bash
-# On Windows (CMD)
-set GEMINI_API_KEY=your-gemini-api-key
-
-# On Windows (PowerShell)
-$env:GEMINI_API_KEY="your-gemini-api-key"
-```
-
-### 3. Run Server
-```bash
 python app.py
 ```
-Open **`http://127.0.0.1:5000`** in your browser.
+
+Then open `http://127.0.0.1:5000` in your browser.
 
 ---
 
-## Security & Key Handling
+## Getting started with Version 2
 
-Your API credentials are safe:
-- **Version 2**: All keys are stored client-side in browser `localStorage`. API calls are dispatched directly to the model endpoints from your browser. Nothing is sent to external trackers or secondary servers.
-- **Version 1**: Env keys are handled entirely on the server-side inside Python, meaning your credentials are never exposed to the client browser source code.
+1. Open `Version2/index.html` in your browser
+2. Click **Set API Key** and paste your Gemini or OpenRouter key
+3. Pick your input tab, add a job description
+4. Hit **Generate**
+
+---
+
+## Your data stays private
+
+- **Version 2**: Keys are stored locally in your browser. API calls go directly from your browser to Google/OpenRouter — nothing passes through any third-party server.
+- **Version 1**: Keys live on your local Python server and are never exposed to the browser.
