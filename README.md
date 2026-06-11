@@ -2,71 +2,64 @@
 
 > **Tailor your resume to clear the ATS machine in one shot.**
 
-Resume Engineer is an interactive AI-powered resume customization assistant designed specifically for early-career developers, SWEs, and data scientists. By matching your base resume (either raw LaTeX code or a PDF upload) against a target Job Description, it generates an optimized LaTeX resume, compiles a targeted cover letter, displays a side-by-side diff of tailored enhancements, and runs an ATS simulation report—all in one shot.
+Resume Engineer is an interactive AI-powered resume customization assistant designed specifically for developers, software engineers, and data scientists. By matching your base resume (either raw LaTeX code, plain text, or a PDF upload) against a target Job Description, it generates an optimized LaTeX resume, compiles a targeted cover letter, displays a side-by-side diff of tailored enhancements, and runs an ATS simulation report—all in one shot.
 
 ---
 
-## Architecture & Tech Stack
+## Versions & Releases
 
-Following a robust backend refactor, the application uses a structured client-server architecture:
+This repository contains two main versions of the application:
 
-- **Backend (Server-side)**: Built with **Flask (Python)**. It processes requests, communicates securely with upstream LLM providers, and extracts plain text from binary PDF uploads using `pypdf` on the server.
-- **Frontend (Client-side)**: A modern, responsive UI built with **Vanilla HTML, CSS, and JS**.
-- **Supported AI Providers**: Gemini, OpenRouter, Claude, and OpenAI.
-- **Aesthetic**: Premium, responsive dark/light mode, custom animations, and clean, modern typography.
+### 🚀 Version 2 (Latest — Recommended)
+Located in [`Version2/index.html`](file:///c:/Users/kalig/OneDrive/Desktop/Jar/RE-V2/Version2/index.html).
+- **Architecture**: Single-file, client-side only serverless web application (HTML + CSS + JS in a single file).
+- **Prerequisites**: None! Double-click `Version2/index.html` to open it in your browser directly (no server, no node, no npm required).
+- **Features**:
+  - **3 Input Tabs**:
+    1. **Source**: Drag & drop PDF/TXT/MD files (text extracted client-side via `PDF.js`) or paste raw resume text.
+    2. **LaTeX**: Directly paste your LaTeX base code (AI tailors it end-to-end).
+    3. **Build**: Fill in accordion form builder fields manually.
+  - **API Keys**: Supports **Google AI Studio (Gemini API)** and **OpenRouter** (supporting 5 models) stored securely inside browser `localStorage`.
+  - **ATS Score Donut Chart**: Animated SVG loading progress ring showing match score thresholds (PASS/BORDERLINE/FAIL).
+  - **ATS Sub-Scores**: 4 cards detailing Keyword Density, ATS Formatting, Section Order, and Readability & Bullets out of 25.
+  - **3-Layer Keyword Chips**: Visualizes present (green), missing (red), and suggested click-to-copy additions (blue) with toast confirmations.
+  - **Actionable Improvements**: 5-8 recommendations prioritizing fixes by severity (HIGH/MED/LOW).
+  - **Line-by-Line Monospace Diff**: Collapsible colored diff showing added (+) and removed (-) LaTeX lines.
+  - **Missing Section Warnings**: Warning chips offering [AI Fill] (triggers a secondary targeted JSON API query), [Fill Myself] (focuses and scrolls to the form builder accordion), or [Skip].
+  - **Pre-Apply Checklist**: Verifies 7 criteria for a final "Ready to Apply ✅" indicator.
+  - **Cover Letter Editor**: Inline editor showing word counts and warnings if letter length > 220 words.
+  - **Overleaf Integration**: Submit the customized LaTeX directly to the Overleaf editor snip compiler.
 
----
-
-## Security First: Key Handling
-
-Your API keys are safe. 
-- Local keys are saved directly in your browser's `localStorage` and never stored on the server.
-- **Gemini Free Tier**: Out-of-the-box support is enabled. If you do not provide your own key, the backend automatically falls back to a server-side default key or uses the `GEMINI_API_KEY` defined in your environment variables. 
-- Fallback keys are handled entirely on the server-side inside Python, meaning your keys are **never** exposed to the frontend/browser client source code.
-
----
-
-## Repository Structure
-
-```text
-RE-V2/
-├── app.py              # Flask Application (API endpoints, PDF parsing, AI dispatches)
-├── requirements.txt    # Python dependencies
-├── templates/
-│   └── index.html      # Frontend HTML template (refactored with url_for paths)
-├── static/
-│   ├── app.js          # Client-side form handlers & UI rendering logic
-│   └── styles.css      # Vanilla CSS rules, theme palettes, and animations
-├── demo.html           # Original client-only frontend demo
-└── app.js              # Original client-only frontend script (deprecated)
-```
+### 🐍 Version 1 (Classic Flask Server)
+Located in the repository root (`app.py`, `templates/`, `static/`).
+- **Architecture**: Server-based Flask (Python) web application.
+- **Prerequisites**: Python 3.8+ installed, package configuration via `requirements.txt`.
+- **Features**: Extracts text from PDF uploads server-side using `pypdf`, and queries model handlers on the backend.
 
 ---
 
-## Getting Started
+## Quick Start (Version 2)
 
-### Prerequisites
+1. Open [`Version2/index.html`](file:///c:/Users/kalig/OneDrive/Desktop/Jar/RE-V2/Version2/index.html) in your browser.
+2. Enter your API Key in the Settings Modal (Gemini API key from Google AI Studio is recommended).
+3. Set your input tab (**Source**, **LaTeX**, or **Build**) and add your target Job Description.
+4. Click **Generate** and view your optimized LaTeX, ATS report, and cover letter.
 
-Make sure you have **Python 3.8+** installed.
+---
+
+## Quick Start (Version 1 — Flask App)
 
 ### 1. Installation
-
-Clone the repository and install the required Python packages:
-
+Clone the repository and install the Python requirements:
 ```bash
 git clone https://github.com/Sridattasai18/Resume-Engineer.git
 cd Resume-Engineer
 pip install -r requirements.txt
 ```
 
-### 2. Configure environment (Optional)
-
-If you want to use your own server-side Gemini key as the default, define it in your shell environment:
-
+### 2. Configure Environment (Optional)
+Specify your Gemini key as an environment variable to use it as the backend fallback default:
 ```bash
-# On Linux/macOS
-export GEMINI_API_KEY="your-gemini-api-key"
-
 # On Windows (CMD)
 set GEMINI_API_KEY=your-gemini-api-key
 
@@ -74,27 +67,16 @@ set GEMINI_API_KEY=your-gemini-api-key
 $env:GEMINI_API_KEY="your-gemini-api-key"
 ```
 
-### 3. Run the application
-
-Start the Flask server locally:
-
+### 3. Run Server
 ```bash
 python app.py
 ```
-
-The application will start on **`http://127.0.0.1:5000`**. Open it in your browser and start tailoring!
+Open **`http://127.0.0.1:5000`** in your browser.
 
 ---
 
-## Features & Usage
+## Security & Key Handling
 
-1. **Upload or Paste**:
-   - In **LaTeX mode**, paste your base LaTeX resume code, or click **Or upload PDF resume…** to upload a PDF.
-   - Or, switch to **Build from scratch** to input your details section-by-section.
-2. **Add Context**: Paste the Target Job Description in the text area.
-3. **Pick a Template**: Select one of our built-in ATS-friendly templates (e.g., *Jake Classic* or *Data Science*).
-4. **Generate**: Click **Generate tailored resume**.
-5. **Clear the ATS**:
-   - Check the **ATS Report** to see your JD match score and missing keywords.
-   - Inspect the **LaTeX Code** or copy it directly to Overleaf.
-   - View the visual **HTML Preview** or download your custom **Cover Letter**.
+Your API credentials are safe:
+- **Version 2**: All keys are stored client-side in browser `localStorage`. API calls are dispatched directly to the model endpoints from your browser. Nothing is sent to external trackers or secondary servers.
+- **Version 1**: Env keys are handled entirely on the server-side inside Python, meaning your credentials are never exposed to the client browser source code.
